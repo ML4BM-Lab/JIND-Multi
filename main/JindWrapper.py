@@ -142,10 +142,10 @@ class JindWrapper:
         if model is not None:
             self.jind_obj = JindLib(self.train_data[self.train_data[BATCH] == self.source_dataset_name], self.path, self.config, model=model, val_stats=val_stats)
             print("\n[JindWrapper] An already trained model with its val_stats vas provided")
-            print("\n[JindWrapper] Training encoder classifier using {} dataset".format(self.source_dataset_name), self.train_data[self.train_data[BATCH] == self.source_dataset_name].shape)
         else:
             self.jind_obj = JindLib(self.train_data[self.train_data[BATCH] == self.source_dataset_name], self.path, self.config)
             print("\n[JindWrapper] No trained model was provided")
+            print("\n[JindWrapper] Training encoder classifier using {} dataset".format(self.source_dataset_name), self.train_data[self.train_data[BATCH] == self.source_dataset_name].shape)
         
         # Train classifier only if a model is not provided
         if model is None:
@@ -205,11 +205,12 @@ class JindWrapper:
                     [self.source_dataset_name] + [f'{len(self.intermediate_dataset_names)}_inter'],  # Lista concatenada con cadena formateada
                     set(self.target_data[BATCH])  # Conjunto (set)
                     )
-        print("\n[JindWrapper] Plotting JIND model training timeline")
-        raw_acc_per, eff_acc_per, mAP_per, rejected_per = plot_cmat_timeline(self.jind_obj.conf_matrix, self.path, timeline_name, num_datasets=len(self.intermediate_dataset_names)+2, cmat_print_counts=self.config['cmat_print_counts'])
-        
-        print("[JindWrapper] JIND training Done. Run Id = {}".format(self.path.split('/').pop()))
-        return raw_acc_per, eff_acc_per, mAP_per, rejected_per
+        if model is None:
+            print("\n[JindWrapper] Plotting JIND model training timeline")
+            raw_acc_per, eff_acc_per, mAP_per, rejected_per = plot_cmat_timeline(self.jind_obj.conf_matrix, self.path, timeline_name, num_datasets=len(self.intermediate_dataset_names)+2, cmat_print_counts=self.config['cmat_print_counts'])
+            print("[JindWrapper] JIND training Done. Run Id = {}".format(self.path.split('/').pop()))
+            return raw_acc_per, eff_acc_per, mAP_per, rejected_per
+    return None
  
     def get_dataset_with_least_batch_effect(self):
         if len(self.train_dataset_names) == 1:
