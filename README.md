@@ -5,7 +5,7 @@
 <!-- ABOUT THE PROJECT -->
 ## Description
 <p align="center">
-    <img src="images/methods_deepsf.png" width="700" alt="PDF Image">
+    <img src="jind_multi.png" width="700" alt="PDF Image">
 </p>
 
 We introduce JIND-Multi, an extended version of the JIND framework designed for label transfer across datasets using multiple labeled datasets. When applied to single-cell RNA sequencing (scRNA-Seq) data, 
