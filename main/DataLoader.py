@@ -190,7 +190,7 @@ def load_bmmc_omics_data(config):
 
 
 
-def load_data(data_type, config={}, black_list=None, source_dataset_name=None, preserve_target_labels_dataset_name=None):
+def load_data(data_type, config={}, source_dataset_name=None, preserve_target_labels_dataset_name=None):
     # Read Data
     config = get_config(config)['data']
     if data_type == "pancreas":
@@ -214,10 +214,6 @@ def load_data(data_type, config={}, black_list=None, source_dataset_name=None, p
     else:
         data = load_test_data(config['test_data_path'])
    
-    # Remove non desired samples
-    # if black_list is not None:
-    #     data = data[~data['labels'].isin(black_list)]
-
     # Processing
     data = preprocess(data, count_normalize=config['count_normalize'], log_transformation=config['log_transformation'])
     data = dimension_reduction(data, num_features=config['num_features'])

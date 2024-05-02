@@ -12,17 +12,6 @@ global BATCH, LABELS
 BATCH = 'batch'
 LABELS = 'labels'
 
-###
-##
-'''
-things to do:
-- ability for continual integration of datasets.. ie., we have more patient dataset available, can we use that now
-- test with two datasets - one is patient data which is not labelled (private and cannot be used in paper).
-                           other one is public data, gserranos put it in slack.
-- test same setting integration with seuret and something else ...to write for paper
-- Jan 20 is icmr - atleast abstract. will be journal presentation etc.. bigger deal
-- Mar sometime is next deadline
-'''
 
 def evaluate(jind_obj, data, name_tag=None, test_data_name=None):
     source = jind_obj.source_dataset_name
@@ -210,7 +199,8 @@ class JindWrapper:
             raw_acc_per, eff_acc_per, mAP_per, rejected_per = plot_cmat_timeline(self.jind_obj.conf_matrix, self.path, timeline_name, num_datasets=len(self.intermediate_dataset_names)+2, cmat_print_counts=self.config['cmat_print_counts'])
             print("[JindWrapper] JIND training Done. Run Id = {}".format(self.path.split('/').pop()))
             return raw_acc_per, eff_acc_per, mAP_per, rejected_per
-    return None
+        else:
+            return None
  
     def get_dataset_with_least_batch_effect(self):
         if len(self.train_dataset_names) == 1:

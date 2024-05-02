@@ -14,8 +14,6 @@ from ConfigLoader import get_config
 import gc
 import os
 from glob import glob
-import json
-from Models import Classifier, ClassifierBig
 
 # # Filtramos solo los batches que scamara me ha dicho
 #     select_batches = ['Rod_D10', 'Rod_D10_d7', 'Rod_D14', 'Rod_D14_d7', 'Rod_D18', 'Rod_D18_d7', # son de la "casa" y vienen de donantes sanos
@@ -53,13 +51,13 @@ def load_scamara_data():
     ##############################################
     adata_v3 = sc.read(path+'/Python_scVI_adata_V3_state4.h5ad')
     # Ploteamos el dataset entero:
-    #sc.pl.scatter(adata_v3, basis='umap', color=['manual_celltype_annotation_high', 'Product_norm'], frameon=False, show=False)
-    #plt.savefig(f'{path_save}/umap_v3_annotated_batch_labels.png', bbox_inches="tight")
-    select_batches = ['Goo_Pt_110', 'Goo_Pt_116', 'Goo_Pt_125', 'Goo_Pt_245', 'Goo_Pt_253', 'Goo_Pt_263', 'Goo_Pt_276', 'LiX_ac39'] 
+    sc.pl.scatter(adata_v3, basis='umap', color=['manual_celltype_annotation_high', 'Product_norm'], frameon=False, show=False)
+    plt.savefig(f'{path_save}/umap_v3_annotated_batch_labels.png', bbox_inches="tight")
+    select_batches = ['Goo_Pt_110', 'Goo_Pt_116', 'Goo_Pt_125', 'Goo_Pt_245', 'Goo_Pt_253', 'Goo_Pt_263', 'Goo_Pt_276'] 
     adata_v3 = adata_v3[adata_v3.obs['Product_norm'].isin(select_batches)]
     # Ploteamos el dataset filtrado de entrenamiento:
-    #sc.pl.scatter(adata_v3, basis='umap', color=['manual_celltype_annotation_high', 'Product_norm'], frameon=False, show=False)
-    #plt.savefig(f'{path_save}/umap_v3_txiki_annotated_batch_labels.png', bbox_inches="tight")
+    sc.pl.scatter(adata_v3, basis='umap', color=['manual_celltype_annotation_high', 'Product_norm'], frameon=False, show=False)
+    plt.savefig(f'{path_save}/umap_v3_txiki_annotated_batch_labels.png', bbox_inches="tight")
     data_v3 = adata_v3.to_df()
     data_v3['batch'] = adata_v3.obs['Product_norm']
     data_v3['labels'] = adata_v3.obs['manual_celltype_annotation_high']
@@ -74,12 +72,10 @@ def load_scamara_data():
     common_labels.sort()
     data_v3 = data_v3[data_v3['labels'].isin(common_labels)]
     # Heatmap of labels counts per batch
-    #heatmap_celltypes(data_v3, path_save, database_name = 'v3')
+    heatmap_celltypes(data_v3, path_save, database_name = 'v3')
     # V4 - Tiene más muestras y es el que queremos probar como sale la anotación
     ###################################################################################
     adata_v4 = sc.read(path+'/Python_scVI_adata_V4_state4.h5ad')
-    #select_batches = ['Goo_Pt_110']
-    adata_v4 = adata_v4[adata_v4.obs['Product_norm'].isin(select_batches)] # LUEGO QUITAR ESTA !!!!!!!!!!!!!!!!!!!!!!!!!
     data_v4 = adata_v4.to_df()
     data_v4['batch'] = adata_v4.obs['Product_norm']
     if 'manual_celltype_annotation_high' in adata_v4.obs:
@@ -189,27 +185,5 @@ if __name__ == "__main__":
     main(args)
 
 
-#nohup python /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi/main/Main_scamara.py --list_target_batches 'Goo_Pt_110' > out_scamara.out &
-
-# ya hechos:  none
-# list_target_batch = ['Bai_CR_basal', 'Bai_CR_CD19_cocult', 'Bai_CR_MESO_cocult', 'Bai_HD_CD19_cocult', 'Bai_HD_MESO_cocult', 'Bai_HD_basal', 'Bai_NR_basal', 'Bai_NR_CD19_cocult', 'Bai_NR_MESO_cocult', 
-#'Bor_D1_28Z_CD19_Stim', 'Bor_D1_28Z_No_Stim', 'Bor_D1_BBZ_CD19_Stim', 'Bor_D1_BBZ_No_Stim', 'Bor_D1_Z_CD19_Stim', 'Bor_D1_Z_No_Stim', 'Bor_D2_28Z_CD19_Stim', 'Bor_D2_28Z_No_Stim', 'Bor_D2_BBZ_CD19_Stim', 
-#'Bor_D2_BBZ_No_Stim', 'Bor_D2_Z_CD19_Stim', 'Bor_D2_Z_No_Stim', 'Den_Pt_14', 'Den_Pt_15', 'Den_Pt_16', 'Den_Pt_18', 'Den_Pt_20', 'Den_Pt_21', 'Den_Pt_26', 'Den_Pt_27', 'Den_Pt_28', 'Den_Pt_33', 'Den_Pt_34', 
-#'Den_Pt_37', 'Den_Pt_38', 'Den_Pt_40', 'Den_Pt_41', 'Den_Pt_42', 'Den_Pt_43', 'Den_Pt_49', 'Den_Pt_50', 'Den_Pt_54', 'Den_Pt_55', 'Den_Pt_56', 'Den_Pt_59', 'Den_Pt_64', 'Goo_Pt_110', 'Goo_Pt_116', 'Goo_Pt_125', 
-#'Goo_Pt_129', 'Goo_Pt_245', 'Goo_Pt_253', 'Goo_Pt_263', 'Goo_Pt_276', 'Goo_Pt_282', 'Lyn_Exp1_CD19', 'Lyn_Exp1_GD2', 'Lyn_Exp2_Cont', 'Lyn_Exp2_JUN', 'Mel_PT1_M12', 'Mel_PT1_M15', 'Mel_PT1_Y9', 'Mel_PT2_M3', 'Mel_PT2_Y3', 
-#'Mel_PT2_Y6_5', 'She_CLL_1_d21', 'She_CLL_1_d38', 'She_CLL_1_d112', 'She_CLL_1_IP', 'She_CLL_2_d12', 'She_CLL_2_d29', 'She_CLL_2_d83', 'She_CLL_2_IP', 'She_NHL_6_d12', 'She_NHL_6_d29', 'She_NHL_6_d102', 'She_NHL_7_d12', 
-#'She_NHL_7_d28', 'She_NHL_7_d89', 'She_NHL_7_IP', 'Wan_PD1', 'Wan_PD2', 'Wan_PD3', 'Wan_SPD1', 'Wan_SPD2', 'Wan_SPD3', 'Xha_Control', 'Xha_Raji_stim_1', 'Xha_Raji_stim_2', 'LiX_IP', 'LiX_PP', 'LiX_RP', 'Rod_D10', 
-#'Rod_D10_d7', 'Rod_D14', 'Rod_D14_d7', 'Rod_D18', 'Rod_D18_d7', 'Har_Pat1_IP', 'Har_Pat2_D7', 'Har_Pat2_IP', 'Har_Pat3_IP', 'Har_Pat4_IP', 'Har_Pat5_IP', 'Har_Pat6_D7', 'Har_Pat7_D7', 'Har_Pat7_IP', 'Har_Pat8_IP', 
-#'Har_Pat8_D7', 'Har_Pat9_IP', 'Har_Pat10_IP', 'Har_Pat10_D7', 'Har_Pat11_D7', 'Har_Pat12_D7', 'Har_Pat12_IP', 'Har_Pat12_D14', 'Har_Pat13_IP', 'Har_Pat14_D14', 'Har_Pat14_IP', 'Har_Pat15_D7', 'Har_Pat15_IP', 
-#'Har_Pat16_D7', 'Har_Pat16_IP', 'Har_Pat18_IP', 'Har_Pat19_IP', 'Har_Pat20_IP', 'Har_Pat20_D14', 'Har_Pat21_D7', 'Har_Pat21_D14', 'Har_Pat21_IP', 'Har_Pat22_D7', 'Har_Pat22_IP', 'Har_Pat23_D7', 'Har_Pat23_IP', 
-#'Har_Pat24_IP', 'Har_Pat24_D7', 'Har_Pat25_IP', 'Har_Pat25_D7', 'Har_Pat26_IP', 'Har_Pat26_D7', 'Har_Pat27_D7', 'Har_Pat27_IP', 'Har_Pat28_IP', 'Har_Pat28_D7', 'Har_Pat29_IP', 'Har_Pat29_IP_retreat', 'Har_Pat29_D7', 
-#'Har_Pat29_D7_retreat', 'Har_Pat30_D7', 'Har_Pat30_IP', 'Har_Pat31_D7', 'Har_Pat31_IP', 'Har_Pat32_IP', 'Har_Pat32_D7', 'LiX_ac25', 'LiX_ac26', 'LiX_ac27', 'LiX_ac28', 'LiX_ac29', 'LiX_ac30', 'LiX_ac31', 'LiX_ac32', 
-#'LiX_ac33', 'LiX_ac34', 'LiX_ac36', 'LiX_ac37', 'LiX_ac38', 'LiX_ac39', 'LiX_ac40', 'LiX_ac42', 'LiX_ac44', 'LiX_ac45', 'LiX_ac47', 'LiX_ac49', 'LiX_ac50', 'LiX_ac51', 'LiX_ac52', 'LiX_ac53', 'LiX_ac54', 'LiX_ac55', 
-#'LiX_ac57', 'LiX_ac58', 'LiX_ac59']
-
-# ESTARÍ ABIEN QUE JIND_MULTI TUVIERA UNA FORMA DE SACAR EL MODELO UNA VEZ QUE HA ENTRENADO LOS SOURCES Y QUE PUEDAS ENTRENAR CUALQUIER GAN EN EL TEST DATA CON EL MISMO OBJETO JIND_WRAPPER
-# AHORA CADA VEZ QUE QUIERES ANOTAR UN ÚNICO TARGET TIENES QUE ENTRENAR TODOS LOS SOURCES!
-
-# for batch in batches_v3:
-#     print(batch, data_v3[data_v3.batch == batch].shape, len(data_v3[data_v3.batch == batch]['labels'].unique()))
+#nohup python /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi/main/Main_scamara.py --list_target_batches 'Bai_CR_basal' 'Bai_CR_CD19_cocult' 'Bai_CR_MESO_cocult' 'Bai_HD_CD19_cocult' 'Bai_HD_MESO_cocult' 'Bai_HD_basal' 'Bai_NR_basal' 'Bai_NR_CD19_cocult' 'Bai_NR_MESO_cocult' 'Bor_D1_28Z_CD19_Stim' 'Bor_D1_28Z_No_Stim' 'Bor_D1_BBZ_CD19_Stim' 'Bor_D1_BBZ_No_Stim' 'Bor_D1_Z_CD19_Stim' 'Bor_D1_Z_No_Stim' 'Bor_D2_28Z_CD19_Stim' 'Bor_D2_28Z_No_Stim' 'Bor_D2_BBZ_CD19_Stim' 'Bor_D2_BBZ_No_Stim' 'Bor_D2_Z_CD19_Stim' 'Bor_D2_Z_No_Stim' 'Den_Pt_14' 'Den_Pt_15' 'Den_Pt_16' 'Den_Pt_18' 'Den_Pt_20' 'Den_Pt_21' 'Den_Pt_26' 'Den_Pt_27' 'Den_Pt_28' 'Den_Pt_33' 'Den_Pt_34' 'Den_Pt_37' 'Den_Pt_38' 'Den_Pt_40' 'Den_Pt_41' 'Den_Pt_42' 'Den_Pt_43' 'Den_Pt_49' 'Den_Pt_50' 'Den_Pt_54' 'Den_Pt_55' 'Den_Pt_56' 'Den_Pt_59' 'Den_Pt_64' 'Goo_Pt_116' 'Goo_Pt_125' 'Goo_Pt_129' 'Goo_Pt_245' 'Goo_Pt_253' 'Goo_Pt_263' 'Goo_Pt_276' 'Goo_Pt_282' 'Lyn_Exp1_CD19' 'Lyn_Exp1_GD2' 'Lyn_Exp2_Cont' 'Lyn_Exp2_JUN' 'Mel_PT1_M12' 'Mel_PT1_M15' 'Mel_PT1_Y9' 'Mel_PT2_M3' 'Mel_PT2_Y3' 'Mel_PT2_Y6_5' 'She_CLL_1_d21' 'She_CLL_1_d38' 'She_CLL_1_d112' 'She_CLL_1_IP' 'She_CLL_2_d12' 'She_CLL_2_d29' 'She_CLL_2_d83' 'She_CLL_2_IP' 'She_NHL_6_d12' 'She_NHL_6_d29' 'She_NHL_6_d102' 'She_NHL_7_d12' 'She_NHL_7_d28' 'She_NHL_7_d89' 'She_NHL_7_IP' 'Wan_PD1' 'Wan_PD2' 'Wan_PD3' 'Wan_SPD1' 'Wan_SPD2' 'Wan_SPD3' 'Xha_Control' 'Xha_Raji_stim_1' 'Xha_Raji_stim_2' 'LiX_IP' 'LiX_PP' 'LiX_RP' 'Rod_D10' 'Rod_D10_d7' 'Rod_D14' 'Rod_D14_d7' 'Rod_D18' 'Rod_D18_d7' 'Har_Pat1_IP' 'Har_Pat2_D7' 'Har_Pat2_IP' 'Har_Pat3_IP' 'Har_Pat4_IP' 'Har_Pat5_IP' 'Har_Pat6_D7' 'Har_Pat7_D7' 'Har_Pat7_IP' 'Har_Pat8_IP' 'Har_Pat8_D7' 'Har_Pat9_IP' 'Har_Pat10_IP' 'Har_Pat10_D7' 'Har_Pat11_D7' 'Har_Pat12_D7' 'Har_Pat12_IP' 'Har_Pat12_D14' 'Har_Pat13_IP' 'Har_Pat14_D14' 'Har_Pat14_IP' 'Har_Pat15_D7' 'Har_Pat15_IP' 'Har_Pat16_D7' 'Har_Pat16_IP' 'Har_Pat18_IP' 'Har_Pat19_IP' 'Har_Pat20_IP' 'Har_Pat20_D14' 'Har_Pat21_D7' 'Har_Pat21_D14' 'Har_Pat21_IP' 'Har_Pat22_D7' 'Har_Pat22_IP' 'Har_Pat23_D7' 'Har_Pat23_IP' 'Har_Pat24_IP' 'Har_Pat24_D7' 'Har_Pat25_IP' 'Har_Pat25_D7' 'Har_Pat26_IP' 'Har_Pat26_D7' 'Har_Pat27_D7' 'Har_Pat27_IP' 'Har_Pat28_IP' 'Har_Pat28_D7' 'Har_Pat29_IP' 'Har_Pat29_IP_retreat' 'Har_Pat29_D7' 'Har_Pat29_D7_retreat' 'Har_Pat30_D7' 'Har_Pat30_IP' 'Har_Pat31_D7' 'Har_Pat31_IP' 'Har_Pat32_IP' 'Har_Pat32_D7' 'LiX_ac25' 'LiX_ac26' 'LiX_ac27' 'LiX_ac28' 'LiX_ac29' 'LiX_ac30' 'LiX_ac31' 'LiX_ac32' 'LiX_ac33' 'LiX_ac34' 'LiX_ac36' 'LiX_ac37' 'LiX_ac38' 'LiX_ac39' 'LiX_ac40' 'LiX_ac42' 'LiX_ac44' 'LiX_ac45' 'LiX_ac47' 'LiX_ac49' 'LiX_ac50' 'LiX_ac51' 'LiX_ac52' 'LiX_ac53' 'LiX_ac54' 'LiX_ac55' 'LiX_ac57' 'LiX_ac58' 'LiX_ac59' > out_scamara_restofthem.out &
 
