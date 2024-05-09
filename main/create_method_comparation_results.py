@@ -118,7 +118,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ### Load Data and Normalize
-    data = load_data(data_type = args.DATA_TYPE, black_list= args.BLACK_LIST, source_dataset_name=args.SOURCE_DATASET_NAME) #  caso 2)
+    data = load_data(data_type = args.DATA_TYPE, source_dataset_name=args.SOURCE_DATASET_NAME) #  caso 2)
     # caso 3) data = load_data(data_type = args.DATA_TYPE, black_list= args.BLACK_LIST, source_dataset_name=args.SOURCE_DATASET_NAME, preserve_target_labels_dataset_name=args.TARGET_DATASET_NAME)
     run_results = main(args, data, args.N_TRIAL) # Results of the trial
     

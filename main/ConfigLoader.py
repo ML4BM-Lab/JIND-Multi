@@ -44,8 +44,8 @@ def get_default_config():
             "count_normalize": True,
             "log_transformation": True,
             "num_features": 5000,
-            "min_cell_type_population": 100, # by default put at least 100 always. 
-            # 20 for "NSCLC_lung", 5 for "pancreas" when using source 3, 100 for "human_brain", 18 for "bmmc_ATAC", 100 for all ATAC2 tissues
+            "min_cell_type_population": 18, # by default put at least 100 always. 
+            # 20 for "NSCLC_lung", 5 for "pancreas" when using source 3, 100 for "human_brain", 18 for "bmmc_ATAC", 100 for all ATAC2 tissues (liver atac2 35)
 
             "max_cells_for_dataset": 50000,
             "test_data_path": "../resources/data/test/",
@@ -55,7 +55,7 @@ def get_default_config():
             "brca_data_path": "../resources/data/breast/BRCA_data.h5ad",
             "bmmc_atac_path": "../resources/data/bmmc/data_multiome_annotated_BMMC_ATAC.h5ad",
             "bmmc_gex_path": "../resources/data/bmmc/data_multiome_annotated_BMMC_GEX.h5ad",
-            "atac2_data_path": "../resources/data/atac_2/Filtered_Norm_Scaled_data_Annotated.h5ad",
+            "atac2_data_path": "../resources/data/atac_2/Filtered_Norm_Scaled_data_Annotated_subseted.h5ad",
             "tissue_data_path": "../resources/data/atac_2/tissue_sample_norm_scaled_data_annotated.h5ad",
             "brain_data_source": "MouseV1",
             "brain_data_source_gene_nums": 8000

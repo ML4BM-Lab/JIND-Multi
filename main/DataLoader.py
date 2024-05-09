@@ -6,22 +6,19 @@ from torch.utils.data import DataLoader, Dataset
 from Utils import dimension_reduction, preprocess, filter_cells, create_scanpy_embeddings, create_scanpy_umap, create_umap_from_dataframe
 from ConfigLoader import get_config
 
-
-# def generate_datasets_from_atac2():
-#     path = get_config()['data']['atac2_data_path']
-#     # Select tissues batch and labels for the experiment:
-#     adata = sc.read_h5ad(path)
-#     selected_tissues = ['heart_sample', 'liver_sample', 'kidney_sample', 'lung_sample', 'cerebrum_sample']
-#     filtered_adata = adata[adata.obs['cell_id'].str.startswith(tuple(selected_tissues))]
+def generate_datasets_from_atac2():
+    path = get_config()['data']['atac2_data_path']
+    # Select tissues batch and labels for the experiment:
+    adata = sc.read_h5ad(path)
+    selected_tissues = ['heart_sample', 'liver_sample', 'kidney_sample', 'lung_sample', 'cerebrum_sample']
+    filtered_adata = adata[adata.obs['cell_id'].str.startswith(tuple(selected_tissues))]
+    for tissue in selected_tissues:
+        # Create a adata object for each of the tissues
+        tissue_adata = filtered_adata[filtered_adata.obs['cell_id'].str.startswith(tissue)]
+        # Write each tissue's adata to a separate H5AD file
+        path_save = '/home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi/resources/data/atac_2'
+        tissue_adata.write(f'{path_save}/{tissue}_norm_scaled_data_annotated.h5ad')
     
-#     for tissue in selected_tissues:
-#         # Create a adata object for each of the tissues
-#         tissue_adata = filtered_adata[filtered_adata.obs['cell_id'].str.startswith(tissue)]
-#         # Write each tissue's adata to a separate H5AD file
-#         path_save = '/home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi/resources/data/atac_2'
-#         tissue_adata.write(f'{path[0:24]}/{tissue}_norm_scaled_data_annotated.h5ad')
-    
-
 def load_tissue_atac2_data_path(path):
     adata = sc.read_h5ad(path)
     data = adata.to_df()
@@ -34,6 +31,7 @@ def load_tissue_atac2_data_path(path):
     common_labels = list(set.intersection(*[set(data[data['batch'] == batch]['labels']) for batch in batches]))
     common_labels.sort()
     data = data[data['labels'].isin(common_labels)]
+    print(data.dropna())
     return data
 
     # heart: source: heart_sample_39, target: heart_sample_14; before min cell filtering: 35194 samples, 12436 genes and 20 labels
