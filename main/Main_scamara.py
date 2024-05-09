@@ -167,14 +167,6 @@ def main(args):
             print('[main] Warning: Trained JIND Multi with this data for the first time')
             jind.train(target_data = test_data)
 
-
-        # # Change target_model name so can't be confussed
-        # print("[main] g) Change target_model name so can't be confussed")
-        # output_path = output_path+'/'
-        # original_path = os.path.join(output_path, f'{target_batch}_bestbr_ftune.pth')
-        # modified_path = os.path.join(output_path, f'target_{target_batch}_bestbr_ftune.pth')
-        # os.rename(original_path, modified_path)
-
         # gc.collect()
         # torch.cuda.empty_cache()
 
@@ -183,7 +175,6 @@ if __name__ == "__main__":
     parser.add_argument('--list_target_batches', nargs='+', help='List of target batches')
     args = parser.parse_args()
     main(args)
-
 
 #nohup python /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi/main/Main_scamara.py --list_target_batches 'Bai_CR_basal' 'Bai_CR_CD19_cocult' 'Bai_CR_MESO_cocult' 'Bai_HD_CD19_cocult' 'Bai_HD_MESO_cocult' 'Bai_HD_basal' 'Bai_NR_basal' 'Bai_NR_CD19_cocult' 'Bai_NR_MESO_cocult' 'Bor_D1_28Z_CD19_Stim' 'Bor_D1_28Z_No_Stim' 'Bor_D1_BBZ_CD19_Stim' 'Bor_D1_BBZ_No_Stim' 'Bor_D1_Z_CD19_Stim' 'Bor_D1_Z_No_Stim' 'Bor_D2_28Z_CD19_Stim' 'Bor_D2_28Z_No_Stim' 'Bor_D2_BBZ_CD19_Stim' 'Bor_D2_BBZ_No_Stim' 'Bor_D2_Z_CD19_Stim' 'Bor_D2_Z_No_Stim' 'Den_Pt_14' 'Den_Pt_15' 'Den_Pt_16' 'Den_Pt_18' 'Den_Pt_20' 'Den_Pt_21' 'Den_Pt_26' 'Den_Pt_27' 'Den_Pt_28' 'Den_Pt_33' 'Den_Pt_34' 'Den_Pt_37' 'Den_Pt_38' 'Den_Pt_40' 'Den_Pt_41' 'Den_Pt_42' 'Den_Pt_43' 'Den_Pt_49' 'Den_Pt_50' 'Den_Pt_54' 'Den_Pt_55' 'Den_Pt_56' 'Den_Pt_59' 'Den_Pt_64' 'Goo_Pt_116' 'Goo_Pt_125' 'Goo_Pt_129' 'Goo_Pt_245' 'Goo_Pt_253' 'Goo_Pt_263' 'Goo_Pt_276' 'Goo_Pt_282' 'Lyn_Exp1_CD19' 'Lyn_Exp1_GD2' 'Lyn_Exp2_Cont' 'Lyn_Exp2_JUN' 'Mel_PT1_M12' 'Mel_PT1_M15' 'Mel_PT1_Y9' 'Mel_PT2_M3' 'Mel_PT2_Y3' 'Mel_PT2_Y6_5' 'She_CLL_1_d21' 'She_CLL_1_d38' 'She_CLL_1_d112' 'She_CLL_1_IP' 'She_CLL_2_d12' 'She_CLL_2_d29' 'She_CLL_2_d83' 'She_CLL_2_IP' 'She_NHL_6_d12' 'She_NHL_6_d29' 'She_NHL_6_d102' 'She_NHL_7_d12' 'She_NHL_7_d28' 'She_NHL_7_d89' 'She_NHL_7_IP' 'Wan_PD1' 'Wan_PD2' 'Wan_PD3' 'Wan_SPD1' 'Wan_SPD2' 'Wan_SPD3' 'Xha_Control' 'Xha_Raji_stim_1' 'Xha_Raji_stim_2' 'LiX_IP' 'LiX_PP' 'LiX_RP' 'Rod_D10' 'Rod_D10_d7' 'Rod_D14' 'Rod_D14_d7' 'Rod_D18' 'Rod_D18_d7' 'Har_Pat1_IP' 'Har_Pat2_D7' 'Har_Pat2_IP' 'Har_Pat3_IP' 'Har_Pat4_IP' 'Har_Pat5_IP' 'Har_Pat6_D7' 'Har_Pat7_D7' 'Har_Pat7_IP' 'Har_Pat8_IP' 'Har_Pat8_D7' 'Har_Pat9_IP' 'Har_Pat10_IP' 'Har_Pat10_D7' 'Har_Pat11_D7' 'Har_Pat12_D7' 'Har_Pat12_IP' 'Har_Pat12_D14' 'Har_Pat13_IP' 'Har_Pat14_D14' 'Har_Pat14_IP' 'Har_Pat15_D7' 'Har_Pat15_IP' 'Har_Pat16_D7' 'Har_Pat16_IP' 'Har_Pat18_IP' 'Har_Pat19_IP' 'Har_Pat20_IP' 'Har_Pat20_D14' 'Har_Pat21_D7' 'Har_Pat21_D14' 'Har_Pat21_IP' 'Har_Pat22_D7' 'Har_Pat22_IP' 'Har_Pat23_D7' 'Har_Pat23_IP' 'Har_Pat24_IP' 'Har_Pat24_D7' 'Har_Pat25_IP' 'Har_Pat25_D7' 'Har_Pat26_IP' 'Har_Pat26_D7' 'Har_Pat27_D7' 'Har_Pat27_IP' 'Har_Pat28_IP' 'Har_Pat28_D7' 'Har_Pat29_IP' 'Har_Pat29_IP_retreat' 'Har_Pat29_D7' 'Har_Pat29_D7_retreat' 'Har_Pat30_D7' 'Har_Pat30_IP' 'Har_Pat31_D7' 'Har_Pat31_IP' 'Har_Pat32_IP' 'Har_Pat32_D7' 'LiX_ac25' 'LiX_ac26' 'LiX_ac27' 'LiX_ac28' 'LiX_ac29' 'LiX_ac30' 'LiX_ac31' 'LiX_ac32' 'LiX_ac33' 'LiX_ac34' 'LiX_ac36' 'LiX_ac37' 'LiX_ac38' 'LiX_ac39' 'LiX_ac40' 'LiX_ac42' 'LiX_ac44' 'LiX_ac45' 'LiX_ac47' 'LiX_ac49' 'LiX_ac50' 'LiX_ac51' 'LiX_ac52' 'LiX_ac53' 'LiX_ac54' 'LiX_ac55' 'LiX_ac57' 'LiX_ac58' 'LiX_ac59' > out_scamara_restofthem.out &
 
