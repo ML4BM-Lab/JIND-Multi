@@ -14,14 +14,12 @@ JIND-Multi demonstrates a significant reduction in the proportion of unclassifie
 Notably, our model achieves robust and accurate results 
 in its inaugural application to scATAC-Seq data, showcasing its effectiveness in this context.
 
-#### Publication: 
-
 ### Built With
 *   <a href="https://www.python.org/">
-      <img src="https://www.python.org/static/community_logos/python-logo.png" width="110" alt="python" >
+      <img src="https://www.python.org/static/community_logos/python-logo.png" width="80" alt="python" >
     </a>
 *   <a href="https://pytorch.org/">
-      <img src="https://pytorch.org/assets/images/pytorch-logo.png" width="105" alt="pytorch" >
+      <img src="https://pytorch.org/assets/images/pytorch-logo.png" width="80" alt="pytorch" >
     </a>
 
 ## Clone repository & create the Conda environment
@@ -36,28 +34,17 @@ conda activate jind
 ## Data
 The datasets can be downloaded from the following links:  https://doi.org/10.5281/zenodo.11098805
 
-## Applying the Model ('\main')
-Within the 'main' folder, you will find a file named main.py, which carries out all the necessary steps to annotate a dataset using various differently annotated batches. To execute it, simply run the Python script.
+## Applying the Model
+Within the `main` folder, you will find a file named `main.py`, which carries out all the necessary steps to annotate a dataset using various differently annotated batches. To execute it, simply run the following Python script.
 
 shell
 Copy code
 python Main.py -dt pancreas -s 0 -t 2 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi
-Here, -dt represents the name of the dataset to be loaded, -s signifies the primary source batch among the available annotated batches, -t denotes the target batch to annotate, and -p points to the path of the 'jind_multi' folder. These arguments are parsed when calling the Main.py script as follows:
+Here, -dt represents the name of the dataset to be loaded, -s signifies the primary source batch among the available annotated batches, -t denotes the target batch to annotate, and -p points to the path of the 'jind_multi' folder. 
 
-```python
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='JindMulti')
-    parser.add_argument('-dt', '--DATA_TYPE', type=str, required=True, help='Dataset name') 
-    parser.add_argument('-s', '--SOURCE_DATASET_NAME', type=str, help='Name or ID of source dataset') 
-    parser.add_argument('-t', '--TARGET_DATASET_NAME', type=str, required=True, help='Name or ID of target dataset') 
-    parser.add_argument('-p', '--PATH_WD', type=str, required=True, help='Path to jind_multi folder') 
-    args = parser.parse_args()
-    main(args)
-```
 Let's delve into a detailed explanation of what this code does:
 
 ```python
-
 # 1) load data and normalize
 data = load_data(data_type=args.DATA_TYPE)
 ```
