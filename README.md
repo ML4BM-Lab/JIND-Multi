@@ -9,7 +9,9 @@
 </p>
 
 We introduce JIND-Multi, an extended version of the JIND framework designed for label transfer across datasets using multiple labeled datasets. When applied to single-cell RNA sequencing (scRNA-Seq) data, 
-JIND-Multi demonstrates a significant reduction in the proportion of unclassified cells while preserving accuracy and performance equivalent to JIND. Notably, our model achieves robust and accurate results 
+JIND-Multi demonstrates a significant reduction in the proportion of unclassified cells while preserving accuracy and performance equivalent to JIND. 
+
+Notably, our model achieves robust and accurate results 
 in its inaugural application to scATAC-Seq data, showcasing its effectiveness in this context.
 
 #### Publication: 
