@@ -167,17 +167,17 @@ class JindWrapper:
             
             # Save Trained Model object!
             print("\n[JindWrapper] Save Trained Model and val_stats object ")
-            model_output_path = os.path.abspath(os.path.join(self.path, '../../results'))
+            #model_output_path = os.path.abspath(os.path.join(self.path, '../../results'))
 
             # Save each model separately
-            for key, model in self.jind_obj.model.items():
-                torch.save(model.state_dict(), os.path.join(model_output_path, f'{key}.pt'))
+            for key, model_copy in self.jind_obj.model.items():
+                torch.save(model_copy.state_dict(), os.path.join(self.path, f'{key}.pt'))
                     
             # Save tha val stats calculated
             # Convert NumPy arrays to Python lists
             converted_val_stats = {key: val.tolist() for key, val in self.jind_obj.val_stats.items()}
             # Save the converted data to JSON file
-            with open(os.path.join(model_output_path, 'val_stats_trained_model.json'), 'w') as f:
+            with open(os.path.join(self.path, 'val_stats_trained_model.json'), 'w') as f:
                 json.dump(converted_val_stats, f)
             
         else:
@@ -189,19 +189,23 @@ class JindWrapper:
                
         if predicted_label is not None: 
             predicted_label.to_excel(os.path.join(self.path, "predicted_label_test_data.xlsx"))
-        
-        timeline_name = "train{}-test{}".format(
-                    [self.source_dataset_name] + [f'{len(self.intermediate_dataset_names)}_inter'],  # Lista concatenada con cadena formateada
-                    set(self.target_data[BATCH])  # Conjunto (set)
-                    )
+        print('holaaaaaaa')
+        print(model)
         if model is None:
+            print('holaaaaaaa')
+            timeline_name = "train{}-test{}".format(
+                        [self.source_dataset_name] + [f'{len(self.intermediate_dataset_names)}_inter'],  # Lista concatenada con cadena formateada
+                        set(self.target_data[BATCH])  # Conjunto (set)
+                        )
+            
             print("\n[JindWrapper] Plotting JIND model training timeline")
             raw_acc_per, eff_acc_per, mAP_per, rejected_per = plot_cmat_timeline(self.jind_obj.conf_matrix, self.path, timeline_name, num_datasets=len(self.intermediate_dataset_names)+2, cmat_print_counts=self.config['cmat_print_counts'])
             print("[JindWrapper] JIND training Done. Run Id = {}".format(self.path.split('/').pop()))
             return raw_acc_per, eff_acc_per, mAP_per, rejected_per
         else:
+            print("[JindWrapper] JIND training Done. Run Id = {}".format(self.path.split('/').pop()))
             return None
- 
+        
     def get_dataset_with_least_batch_effect(self):
         if len(self.train_dataset_names) == 1:
             return self.train_dataset_names[0]

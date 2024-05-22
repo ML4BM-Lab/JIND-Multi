@@ -12,6 +12,7 @@ import os
 from Models import Classifier, ClassifierBig
 import json
 import torch
+from ConfigLoader import get_config
 
 def find_saved_models(path_saved_models, train_data):
     # List to store the paths of saved model files
@@ -22,11 +23,13 @@ def find_saved_models(path_saved_models, train_data):
         # Iterate over files in the current directory
         for file in files:
             # Check if the file starts with any of the names in the start_names set
-            if any(file.startswith(name) for name in train_batches):
+            if any(file.startswith(name) for name in train_batches) and file.endswith('.pt'):
                 file_paths.append(os.path.join(root, file))
     return file_paths
 
-def load_trained_models(file_paths, train_data, source_dataset_name, device):
+def load_trained_models(file_paths, train_data, source_dataset_name, config={}):
+    use_cuda = get_config(config)['train_classifier']['cuda']
+    device = torch.device("cuda" if use_cuda else "cpu")
     model = {}
     print("\n[load_trained_models] Already trained models found in file_paths.")
     # Load the Source Classifier Model
@@ -187,21 +190,8 @@ def dimension_reduction(data, num_features=5000):
     return data
 
 
-def filter_cells(data, min_cell_type_population=100, max_cells_for_dataset=50000, source_dataset_name=None, preserve_target_labels_dataset_name=None):
-    # 1) Match labels with Source if a source dataset is provided
-    if source_dataset_name:
-        source_labels = set(data[data['batch'] == source_dataset_name]['labels'])
-        for batch in list(set(data.batch.unique())):
-            if batch != source_dataset_name:
-                if preserve_target_labels_dataset_name and batch == preserve_target_labels_dataset_name:
-                    continue  # Skip matching labels for target dataset 
-                batch_labels = set(data[data['batch'] == batch]['labels'])
-                intersect_labels = batch_labels.intersection(source_labels)
-                data.loc[data['batch'] == batch, 'labels'] = data.loc[data['batch'] == batch, 'labels'].apply(lambda x: x if x in intersect_labels else None)
-                data.dropna(subset=['labels'], inplace=True)
-        print('[Utils][filter_cells] Common labels: Labels of the datasets are now contained in the source dataset labels - DONE')
-
-    # 2) min_cell_type_population and max_cells_for_dataset filter (if one batch has one cell_type with a too low population these samples will be removed too from the other batches)
+def filter_cells(data, min_cell_type_population=100, max_cells_for_dataset=50000):
+    # min_cell_type_population and max_cells_for_dataset filter (if one batch has one cell_type with a too low population these samples will be removed too from the other batches)
     batch_data = data[data['batch'] == data['batch'][0]]
     data_trimmed = batch_data[:max_cells_for_dataset]
     # keep only the first 50K cells for each batch

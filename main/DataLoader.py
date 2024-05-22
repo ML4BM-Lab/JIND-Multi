@@ -6,6 +6,52 @@ from torch.utils.data import DataLoader, Dataset
 from Utils import dimension_reduction, preprocess, filter_cells, create_scanpy_embeddings, create_scanpy_umap, create_umap_from_dataframe
 from ConfigLoader import get_config
 
+def load_and_process_data(path, batch_col, labels_col, config={}):
+    # 1) Read ann object and add batch and labels columns
+    config = get_config(config)['data']
+    adata = sc.read(path)
+    data = adata.to_df()
+    data['batch'] = adata.obs[batch_col]
+    data['labels'] = adata.obs[labels_col]
+    # 2) Select commun genes and labels between batches
+    batches = data['batch'].unique()
+    common_genes = list(set.intersection(*[set(data[data['batch'] == batch].columns) for batch in batches]))
+    common_genes.sort()
+    data = data[list(common_genes)]
+    common_labels = list(set.intersection(*[set(data[data['batch'] == batch]['labels']) for batch in batches]))
+    common_labels.sort()
+    data = data[data['labels'].isin(common_labels)]
+    # 3) Processing
+    data = preprocess(data, count_normalize=config['count_normalize'], log_transformation=config['log_transformation'])
+    data = dimension_reduction(data, num_features=config['num_features'])
+    data = filter_cells(data, min_cell_type_population=config['min_cell_type_population'], max_cells_for_dataset=config['max_cells_for_dataset'])
+    data = data.reindex(sorted(data.columns), axis=1)  # Reorder columns
+    return data
+
+# 4) Plot umap before batch effect reduction
+#sc.pl.scatter(adata, basis='umap', color=[labels_col, batch_col], frameon=False, show=False)
+#plt.savefig("/".join(path.split('/')[0:4])+'/umap_batch_labels.png', bbox_inches="tight")
+ 
+################################## de aquí para abajo versión reproducibility
+
+def load_brain_scatlas_atac(path):
+    adata = sc.read_h5ad(path)
+    data = adata.to_df()
+    
+    
+    
+    data["labels"] = adata.obs.celltype.values.tolist()
+    data["batch"] = data.index.str.split('_').str[:3].str.join('_')
+    batches = data['batch'].unique()
+    common_genes = list(set.intersection(*[set(data[data['batch'] == batch].columns) for batch in batches]))
+    common_genes.sort()
+    data = data[list(common_genes)]
+    common_labels = list(set.intersection(*[set(data[data['batch'] == batch]['labels']) for batch in batches]))
+    common_labels.sort()
+    data = data[data['labels'].isin(common_labels)]
+    print(data.dropna())
+    return data
+
 def generate_datasets_from_atac2():
     path = get_config()['data']['atac2_data_path']
     # Select tissues batch and labels for the experiment:
@@ -209,6 +255,8 @@ def load_data(data_type, config={}, source_dataset_name=None, preserve_target_la
         tissue = data_type.split('_')[0] 
         config2 = config['tissue_data_path'].replace('tissue', tissue)
         data = load_tissue_atac2_data_path(config2)
+    elif data_type == "brain_scatlas_atac":
+        data = load_brain_scatlas_atac(config['brain_scatlas_atac_path'])
     else:
         data = load_test_data(config['test_data_path'])
    
@@ -246,33 +294,3 @@ class DataLoaderCustom(Dataset):
                 sample['w'] = self.weights[self.labels[idx]].astype('float32')
         return sample
 
-
-# def load_brca_data(path={}): 
-#     path = path if path is not None else get_config()['data']['brca_data_path']
-#     adata = sc.read(path)
-#     data = adata.to_df()
-#     data['batch'] = adata.obs['orig.ident']
-#     data['labels'] = adata.obs['celltype_minor'] # options: celltype_subset, celltype_minor, celltype_major
-
-#     batches = data['batch'].unique()
-#     common_genes = list(set.intersection(*[set(data[data['batch'] == batch].columns) for batch in batches]))
-#     common_genes.sort()
-#     data = data[list(common_genes)]
-#     return data    
-
-# def load_brain_data():
-#     data = pd.read_csv("drive/MyDrive/Colab Notebooks/JIND/data/Brain/MouseV1_MouseALM_HumanMTG.csv", index_col='Unnamed: 0')
-#     data['labels'] = list(pd.read_csv("drive/MyDrive/Colab Notebooks/JIND/data/Brain/MouseV1_MouseALM_HumanMTG_Labels34.csv")['x'])
-#     data['batch'] = ['MouseV1'] * 12552 + ['MouseALM'] * 8128 + ['HumanMTG'] * 14055
-
-#     # Cell types which have more than 200 cells in each dataset
-#     data = data[data['labels'].isin( ['Exc L2/3 IT', 'Exc L3/5 IT', 'Exc L4/5 IT', 'Exc L5/6 NP', 'Exc L6 CT', 'Lamp5 Rosehip', 'Pvalb 2', 'Sst 1', 'Sst 5', 'Vip 4'])]
-
-#     batches = data['batch']
-#     labels = data['labels']
-#     data = data.drop(['batch', 'labels'], axis=1)
-#     features = data.columns[np.argsort(-np.var(data.values, axis=0))[:5000]]
-#     data = data[features]
-#     data['batch'] = batches
-#     data['labels'] = labels
-#     return data
