@@ -3,24 +3,26 @@ from JindWrapper import JindWrapper
 from DataLoader import load_and_process_data
 from ConfigLoader import get_config
 import argparse
+import ast
 
-def main(args): 
+def main(args):
     # 0) Setting the training configuration (you can modify more things here)
     config = get_config()
     config['data']['num_features'] = args.NUM_FEATURES
     config['data']['min_cell_type_population'] = args.MIN_CELL_TYPE_POPULATION
-    
-    # 1) Load data and normalized
-    data = load_and_process_data(args.PATH, args.BATCH_COL, args.LABELS_COL, config) 
 
-    # 2) Divide in train and test
+    # 1) Load data and normalize
+    data = load_and_process_data(args.PATH, args.BATCH_COL, args.LABELS_COL, config) 
+ 
+    # 2) Divide into train and test
     train_data = data[data['batch'] != args.TARGET_DATASET_NAME]
     test_data = data[data['batch'] == args.TARGET_DATASET_NAME]
 
     # 3) Create the Jind Multi object
+    train_datasets_names = ast.literal_eval(args.TRAIN_DATASETS_NAMES)
     jind = JindWrapper(
                         train_data=train_data, 
-                        train_dataset_names = args.TRAIN_DATASETS_NAMES, # es una lista,
+                        train_dataset_names=train_datasets_names,  
                         source_dataset_name=args.SOURCE_DATASET_NAME, 
                         output_path=args.OUTPUT_PATH
                     )
@@ -42,8 +44,8 @@ def main(args):
         jind.train(target_data=test_data, model=model, val_stats=val_stats)
 
     else:
-        print('[main] Warning: Trained JIND Multi with this data for the first time')
-        jind.train(target_data = test_data)
+        print('[main] Warning: Training JIND Multi with this data for the first time')
+        jind.train(target_data=test_data)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Main script to execute JindMulti and annotate a target batch using several annotated batches')
@@ -53,12 +55,13 @@ if __name__ == "__main__":
     parser.add_argument('--SOURCE_DATASET_NAME', type=str, required=True, help='Name or ID of the source batch') 
     parser.add_argument('--TARGET_DATASET_NAME', type=str, required=True, help='Name or ID of the target batch')
     parser.add_argument('--OUTPUT_PATH', type=str, required=True, help='Output path to save results and trained model')
-    parser.add_argument('--TRAIN_DATASETS_NAMES', type=str, nargs='*', default=None, help='Optional. List of training batch names in desired order, starting with the source batch, followed by intermediate batches in the order they should be processed')
-    parser.add_argument('--NUM_FEATURES', type=int, default=5000, help='Optional. Number of genes to consider for modelling, for default is 5000')
+    parser.add_argument('--TRAIN_DATASETS_NAMES', type=str, required=True, help='List of training batch names in the desired order, starting with the source batch, followed by intermediate batches in the order they should be processed')
+    parser.add_argument('--NUM_FEATURES', type=int, default=5000, help='Optional. Number of genes to consider for modeling, default is 5000')
     parser.add_argument('--MIN_CELL_TYPE_POPULATION', type=int, default=100, help='Optional. For each batch, the minimum number of cells per cell type necessary for modeling. If this requirement is not met in any batch, the samples belonging to this cell type are removed from all batches')
 
     args = parser.parse_args()
     main(args)
+
 
 # pancreas:  python Main.py --PATH '../resources/data/pancreas/pancreas.h5ad' --BATCH_COL 'batch' --LABELS_COL 'celltype' --SOURCE_DATASET_NAME 0 --TARGET_DATASET_NAME 3 --OUTPUT_PATH '../output/pancreas' --TRAIN_DATASETS_NAMES 0 1 2 --NUM_FEATURES 5000 --MIN_CELL_TYPE_POPULATION 5 
 # brain_scatlas_atac: python Main.py --PATH '../resources/data/brain_scatlas_atac/Integrated_Brain_norm.h5ad' --BATCH_COL 'SAMPLE_ID' --LABELS_COL 'peaks_snn_res.0.3' --SOURCE_DATASET_NAME   --TARGET_DATASET_NAME  --OUTPUT_PATH '../output/-' --TRAIN_DATASETS_NAMES --NUM_FEATURES 10000 --MIN_CELL_TYPE_POPULATION 100

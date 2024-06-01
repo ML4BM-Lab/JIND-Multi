@@ -249,9 +249,11 @@ class JindLib:
                                                                                                    self.source_dataset_name))
             return self.model[self.source_dataset_name]
 
-    def predict(self, data, return_names=False):
-        use_cuda = torch.cuda.is_available()
+    def predict(self, data, config=get_config()['train_classifier'], return_names=False):
+        use_cuda = config['cuda']
+        use_cuda = use_cuda and torch.cuda.is_available()
         device = torch.device("cuda" if use_cuda else "cpu")
+        print(device)
         kwargs = {'num_workers': 4, 'pin_memory': False} if use_cuda else {}
 
         predictions = []

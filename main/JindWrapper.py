@@ -6,6 +6,9 @@ import re
 import pandas as pd
 import os
 import torch
+print("CUDA available:", torch.cuda.is_available())
+print("CUDA version:", torch.version.cuda)
+print("cuDNN version:", torch.backends.cudnn.version())
 import json
 
 global BATCH, LABELS
@@ -171,13 +174,13 @@ class JindWrapper:
 
             # Save each model separately
             for key, model_copy in self.jind_obj.model.items():
-                torch.save(model_copy.state_dict(), os.path.join(self.path, f'{key}.pt'))
-                    
+                torch.save(model_copy.state_dict(), os.path.join(self.path, f'../../results/{key}.pt'))
+
             # Save tha val stats calculated
             # Convert NumPy arrays to Python lists
             converted_val_stats = {key: val.tolist() for key, val in self.jind_obj.val_stats.items()}
             # Save the converted data to JSON file
-            with open(os.path.join(self.path, 'val_stats_trained_model.json'), 'w') as f:
+            with open(os.path.join(self.path, f'../../results/val_stats_trained_model.json'), 'w') as f:
                 json.dump(converted_val_stats, f)
             
         else:

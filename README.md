@@ -27,7 +27,7 @@ To crate a Conda environment using the provided environment.yml, follow these st
 
 ```bash
 git clone https://github.com/ML4BM-Lab/JIND-Multi.git
-cd jind
+cd JIND-Multi
 conda env create -f environment.yml
 conda activate jind
 ```
