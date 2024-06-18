@@ -180,7 +180,7 @@ class JindLib:
             print("Validation Accuracy {:.4f}".format(val_acc))
             if val_acc > best_val_acc:
                 best_val_acc = val_acc
-                #torch.save(model.state_dict(), self.path + "/best_first_classifier.pth")
+                torch.save(model.state_dict(), self.path + "/best_first_classifier.pth")
                 self.val_stats = {'pred': y_pred, 'true': y_true}
                 # Save validation stats to a file
                 with open(f'{self.path}/val_stats.json', 'w') as f:
@@ -191,7 +191,7 @@ class JindLib:
             self.plot_cfmt(self.val_stats['pred'], self.val_stats['true'], 0.05, 'val_cfmt.pdf')
 
         # Finally keep the best model
-        #model.load_state_dict(torch.load(self.path + "/best_classifier.pth"))
+        model.load_state_dict(torch.load(self.path + "/best_first_classifier.pth"))
         self.model[self.source_dataset_name] = model 
         self.model[self.source_dataset_name].eval()
 
@@ -679,11 +679,11 @@ class JindLib:
                     print("Loss not improving, stopping alignment")
                     break
 
-        #if not os.path.isfile(self.path + "/target_{}_bestbr".format(test_dataset_name)):
-            #print("Warning: Alignment did not succeed properly, try changing the gdecay or ddecay!")
-            #torch.save(model_for_test_dataset.state_dict(), self.path + "/target_{}_bestbr.pth".format(test_dataset_name))
+        if not os.path.isfile(self.path + "/target_{}_bestbr".format(test_dataset_name)):
+            print("Warning: Alignment did not succeed properly, try changing the gdecay or ddecay!")
+            torch.save(model_for_test_dataset.state_dict(), self.path + "/target_{}_bestbr.pth".format(test_dataset_name))
 
-        #model_for_test_dataset.load_state_dict(torch.load(self.path + "/target_{}_bestbr.pth".format(test_dataset_name)))
+        model_for_test_dataset.load_state_dict(torch.load(self.path + "/target_{}_bestbr.pth".format(test_dataset_name)))
         self.model = self.update_model_copies(self.model, model_for_test_dataset, test_dataset_name)
 
     def domain_adapt(self, data, config):
@@ -746,12 +746,12 @@ class JindLib:
             print("Validation Accuracy = {:.4f}. Loss = {:.4s}".format(val_acc, str(round(float(s), 4))))
             if s <= best_loss:
                 best_loss = s
-                #torch.save(model.state_dict(), self.path + "/{}_bestbr.pth".format(test_dataset_name))
-                self.model[test_dataset_name] = model
+                torch.save(model.state_dict(), self.path + "/{}_bestbr.pth".format(test_dataset_name))
+                #self.model[test_dataset_name] = model
                 self.evaluate(data)
 
         # Finally keep the best model
-        #model.load_state_dict(torch.load(self.path + "/{}_bestbr.pth".format(test_dataset_name)))
+        model.load_state_dict(torch.load(self.path + "/{}_bestbr.pth".format(test_dataset_name)))
         self.model[test_dataset_name] = model
 
     def clone_models(self, data):
@@ -944,24 +944,17 @@ class JindLib:
             if (metric=='loss' and loss <= best_loss) or (metric=='accuracy' and epoch_val_acc_sum>=best_val_acc):
                 best_loss = loss
                 best_val_acc = epoch_val_acc_sum
-                #torch.save(model_copies[test_dataset_name].state_dict(), self.path + "/{}_bestbr_ftune.pth".format(test_dataset_name))
+                torch.save(model_copies[test_dataset_name].state_dict(), self.path + "/{}_bestbr_ftune.pth".format(test_dataset_name))
 
-                # Updata val_stats
-                self.val_stats = {'pred': y_pred, 'true': y_true}
-                
-                # Save validation stats to a file
-                with open(f'{self.path}/val_stats.json', 'w') as f:
-                    json.dump({'pred': y_pred.tolist(), 'true': y_true.tolist()}, f)
                 if cmat:
                 # Plot validation confusion matrix
                     self.plot_cfmt(self.val_stats['pred'], self.val_stats['true'], 0.05, f'val_cfmtftune_{test_dataset_name}.pdf')
                  
-                self.model = self.update_model_copies(self.model, model_copies[test_dataset_name], test_dataset_name)
                 for dataset_evaluate in set(data[BATCH]):
                     self.evaluate(data[data[BATCH] == dataset_evaluate])
 
         # Finally keep the best model
-        #model_copies[test_dataset_name].load_state_dict(torch.load(self.path + "/{}_bestbr_ftune.pth".format(test_dataset_name)))
+        model_copies[test_dataset_name].load_state_dict(torch.load(self.path + "/{}_bestbr_ftune.pth".format(test_dataset_name)))
         self.model = self.update_model_copies(self.model, model_copies[test_dataset_name], test_dataset_name)
 
     def compare_models(self, model_1, model_2):

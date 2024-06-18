@@ -1,7 +1,7 @@
 def get_default_config():
     config = {
         "ftune_intermediate": True, # default was True
-        "retrain_intermediate": True, # default was True
+        "retrain_intermediate": True, # default was True. Con scamara voy a probar a dejar esto en False a ver.
         'align_target_to_source': False, 
         "plot_tsne": False,
         "cmat_print_counts": True,
@@ -10,13 +10,13 @@ def get_default_config():
             "val_frac": 0.2,
             "seed": 0,
             "batch_size": 128,
-            "cuda": True,
+            "cuda": False,
             "epochs": 15
         },
         "GAN": {
             "seed": 0,
             "batch_size": 128,
-            "cuda": True,
+            "cuda": False,
             "epochs": 15,
             "epochs_da": 15,
             "gdecay": 1e-2,
@@ -30,7 +30,7 @@ def get_default_config():
             "val_frac": 0.1,
             "seed": 0,
             "batch_size": 32,
-            "cuda": True,
+            "cuda": False,
             "epochs": 15,
             "epochs_intermediate": 5,
             "retrain_encoder": True,
@@ -43,7 +43,7 @@ def get_default_config():
         "data": {
             "count_normalize": True,
             "log_transformation": True,
-            "num_features": 10000, # Usually we use 5000.
+            "num_features": 5000, 
             "min_cell_type_population": 5, # by default put at least 100 always. 
             # 20 for "NSCLC_lung", 5 for "pancreas" when using source 3, 100 for "human_brain", 18 for "bmmc_ATAC", 100 for all ATAC2 tissues (liver atac2 35)
 

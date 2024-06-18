@@ -6,15 +6,11 @@ import re
 import pandas as pd
 import os
 import torch
-print("CUDA available:", torch.cuda.is_available())
-print("CUDA version:", torch.version.cuda)
-print("cuDNN version:", torch.backends.cudnn.version())
 import json
 
 global BATCH, LABELS
 BATCH = 'batch'
 LABELS = 'labels'
-
 
 def evaluate(jind_obj, data, name_tag=None, test_data_name=None):
     source = jind_obj.source_dataset_name
@@ -24,20 +20,16 @@ def evaluate(jind_obj, data, name_tag=None, test_data_name=None):
         jind_obj.evaluate(data[data[BATCH] == dataset], name="{}_{}.pdf".format(dataset, name_tag) if name_tag is not None else None)
 
 def perform_domain_adaptation(jind_obj, train_data, test_data, config):
-    # evaluate(jind_obj, train_data.append(test_data), name_tag="initial", test_data_name=test_data[BATCH][0]) # We just want to evaluate the ACTUAL intermediate dataset
     jind_obj.evaluate(test_data, name="{}_{}.pdf".format(test_data[BATCH][0], "initial"))
 
     print("[JindWrapper] Performing Domain Adaptation for {} dataset".format(set(test_data[BATCH])))
     jind_obj.domain_adapt(test_data, config['GAN'])
-    # evaluate(jind_obj, train_data.append(test_data), name_tag="adapt", test_data_name=test_data[BATCH][0]) # We just want to evaluate the ACTUAL intermediate dataset
     jind_obj.evaluate(test_data, name="{}_{}.pdf".format(test_data[BATCH][0], "adapt"))
 
     if config['ftune_intermediate']:
         print("\n[JindWrapper] Fine tuning in parallel for {} dataset".format(set(train_data.append(test_data)[BATCH])))
         config['ftune']['metric'] = 'loss'
-        #jind_obj.ftune(train_data.append(test_data), config['ftune'])     
-        jind_obj.ftune(train_data.append(test_data), config['ftune'], datasets_to_train=list(train_data.append(test_data)[BATCH].unique())) # NEW sino no se guardan los .pth de todos los ficheros. 
-        # De esta forma vamos a guardar el .pth del tune cada vez que introduzcamos un dataset intermedio.
+        jind_obj.ftune(train_data.append(test_data), config['ftune'], datasets_to_train=list(train_data.append(test_data)[BATCH].unique())) 
         evaluate(jind_obj, train_data.append(test_data), name_tag="ftune", test_data_name=test_data[BATCH][0])
 
 def perform_jind_training(jind_obj, train_data, test_data, config):
@@ -66,9 +58,12 @@ def perform_jind_training(jind_obj, train_data, test_data, config):
         jind_obj.evaluate(test_data, name="{}_{}.pdf".format(test_data[BATCH][0], "ftune"))
     jind_obj.plot_tsne_of_batches(train_data.append(test_data), plot_name_after_fineTune)
 
-    # if not test_data['labels'].nunique() > 1: for final version uncomment this
     print("[JindWrapper] Getting the test labels predictions")
     predicted_label = jind_obj.get_filtered_prediction(test_data_without_original_labels)
+    
+    # Adding the original labels back to the predictions
+    if test_data['labels'].nunique() > 1:
+        predicted_label['labels'] = test_data[LABELS].values
     return predicted_label
     
 def save_results_to_sheets(jind, target_dataset_name, mode, config=None):
@@ -170,17 +165,20 @@ class JindWrapper:
             
             # Save Trained Model object!
             print("\n[JindWrapper] Save Trained Model and val_stats object ")
-            #model_output_path = os.path.abspath(os.path.join(self.path, '../../results'))
+            model_output_path = os.path.join(self.path, f'../../results')
+
+            # Ensure the directory exists
+            os.makedirs(model_output_path, exist_ok=True)
 
             # Save each model separately
             for key, model_copy in self.jind_obj.model.items():
-                torch.save(model_copy.state_dict(), os.path.join(self.path, f'../../results/{key}.pt'))
+                torch.save(model_copy.state_dict(), os.path.join(model_output_path, f'{key}.pt'))
 
             # Save tha val stats calculated
             # Convert NumPy arrays to Python lists
             converted_val_stats = {key: val.tolist() for key, val in self.jind_obj.val_stats.items()}
             # Save the converted data to JSON file
-            with open(os.path.join(self.path, f'../../results/val_stats_trained_model.json'), 'w') as f:
+            with open(os.path.join(model_output_path, 'val_stats_trained_model.json'), 'w') as f:
                 json.dump(converted_val_stats, f)
             
         else:
@@ -189,13 +187,13 @@ class JindWrapper:
 
         print("\n[JindWrapper] Training JIND for target dataset {}".format(set(target_data[BATCH])), "Train data shape = ", train_data.shape, "Target data shape = ", target_data.shape)
         predicted_label = perform_jind_training(self.jind_obj, train_data, self.target_data, self.config)
-               
+        print('predicted_label')
+        print(predicted_label)
+
         if predicted_label is not None: 
             predicted_label.to_excel(os.path.join(self.path, "predicted_label_test_data.xlsx"))
-        print('holaaaaaaa')
-        print(model)
+        
         if model is None:
-            print('holaaaaaaa')
             timeline_name = "train{}-test{}".format(
                         [self.source_dataset_name] + [f'{len(self.intermediate_dataset_names)}_inter'],  # Lista concatenada con cadena formateada
                         set(self.target_data[BATCH])  # Conjunto (set)

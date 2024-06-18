@@ -9,7 +9,7 @@
 #SBATCH --output=/scratch/jsanchoz/JIND-Multi/logs/main.out
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jsanchoz@unav.es
-#SBATCH --gres=gpu:rtx3090:1
+###SBATCH --gres=gpu:rtx3090:1
 
 # Script directory
 SCRIPT_DIR="$PWD"
