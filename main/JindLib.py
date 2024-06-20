@@ -253,7 +253,6 @@ class JindLib:
         use_cuda = config['cuda']
         use_cuda = use_cuda and torch.cuda.is_available()
         device = torch.device("cuda" if use_cuda else "cpu")
-        print(device)
         kwargs = {'num_workers': 4, 'pin_memory': False} if use_cuda else {}
 
         predictions = []
@@ -288,28 +287,36 @@ class JindLib:
          
         kwargs = {'num_workers': 4, 'pin_memory': False} if use_cuda else {}
 
-        if LABELS in data.columns:
-            data = data.drop(LABELS, axis=1)
+        #if LABELS in data.columns:
+        #    data = data.drop(LABELS, axis=1)
 
         predictions = []
+        labels = []
+        batches = []
+
         for dataset in set(data[BATCH]):
-            gene_mat = data[data[BATCH] == dataset].drop(BATCH, axis=1)
+            gene_mat = data[data[BATCH] == dataset].drop([BATCH, LABELS], axis=1) 
             test_dataset = DataLoaderCustom(self.get_features(gene_mat))
             test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512, shuffle=False, **kwargs)
 
             model = self.get_model(dataset)
             model.eval()
 
-            y_pred, y_true = [], []
+            y_pred = []
             with torch.no_grad():
                 for sample in test_loader:
                     x = sample['x'].to(device)
                     p = model.get_repr(x)
                     y_pred.append(p.cpu().detach().numpy())
-            predictions = predictions + y_pred
-        predictions = np.concatenate(predictions)
+            # predictions = predictions + y_pred
+            predictions.append(np.concatenate(y_pred))  
+            labels.append(data[data[BATCH] == dataset][LABELS].values)  
+            batches.append(data[data[BATCH] == dataset][BATCH].values)  
 
-        return predictions
+        predictions = np.concatenate(predictions)
+        labels = np.concatenate(labels) # NEW  
+        batches = np.concatenate(batches) # NEW  
+        return predictions, labels, batches 
 
     def get_filtered_prediction(self, data, frac=0.05):
         y_pred = self.predict(data)
@@ -505,12 +512,14 @@ class JindLib:
             return
 
         print("\n[JindLib][plot_TSNE_of_batches] Plotting TSNE for ", plot_name, set(data[BATCH]))
-        emb = self.get_TSNE(self.get_encoding(data))
-        df = pd.DataFrame({'tSNE_x': emb[:, 0], 'tSNE_y': emb[:, 1], 'Labels': data[LABELS], 'Batch': data[BATCH]})
+        
+        predictions, labels, batches = self.get_encoding(data)  
+        emb = self.get_TSNE(predictions)  
+        df = pd.DataFrame({'tSNE_x': emb[:, 0], 'tSNE_y': emb[:, 1], 'Labels': labels, 'Batch': batches}) # NEW MODIFIED
         plot_and_save_tsne(df, self.path, plot_name)
         self.plot_embeddings[plot_name] = self.plot_embeddings.get(plot_name, {})
         self.plot_embeddings[plot_name]['tsne'] = df
-
+        
     def remove_effect(self, train_data, test_data, config):
         if LABELS in train_data.columns:
             train_data = train_data.drop(LABELS, axis=1)

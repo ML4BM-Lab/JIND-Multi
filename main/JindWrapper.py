@@ -141,6 +141,11 @@ class JindWrapper:
             self.jind_obj.evaluate(self.train_data[self.train_data[BATCH] == self.source_dataset_name], name="{}_{}.pdf".format(self.source_dataset_name, "after-train_classifier" ))
             self.batches_trained = [self.source_dataset_name]
 
+            # Plot t-sne
+            base_plot_name = "train{}-test{}".format(self.train_dataset_names, set(self.target_data[BATCH]))  
+            plot_name_initial = "{}_after_train_classifier.pdf".format(base_plot_name)  
+            self.jind_obj.plot_tsne_of_batches(self.train_data.append(self.target_data), plot_name_initial) 
+
             # Train Intermediate datasets
             for train_dataset_name in self.intermediate_dataset_names:
                 train_data = self.train_data[self.train_data[BATCH].isin(self.batches_trained)]
@@ -162,6 +167,11 @@ class JindWrapper:
                     evaluate(self.jind_obj, train_data, name_tag="retrain", test_data_name=train_dataset_name)
                 if self.config['align_target_to_source']:
                     train_data = self.train_data[self.train_data[BATCH] == self.source_dataset_name]
+            
+            # T-sne after training labeled batches
+            base_plot_name = "train{}-test{}".format(self.train_dataset_names, set(self.target_data[BATCH]))  
+            plot_name = "{}_adapt_retrain.pdf".format(base_plot_name)  
+            self.jind_obj.plot_tsne_of_batches(self.train_data.append(self.target_data), plot_name)  
             
             # Save Trained Model object!
             print("\n[JindWrapper] Save Trained Model and val_stats object ")
