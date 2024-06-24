@@ -1,5 +1,6 @@
 import numpy as np
 import torch, sys, os, pdb, os.path
+import itertools
 import json
 import pandas as pd
 from torch import optim
@@ -284,7 +285,6 @@ class JindLib:
     def get_encoding(self, data):
         use_cuda = torch.cuda.is_available()
         device = torch.device("cuda" if use_cuda else "cpu")
-         
         kwargs = {'num_workers': 4, 'pin_memory': False} if use_cuda else {}
 
         #if LABELS in data.columns:
@@ -308,14 +308,14 @@ class JindLib:
                     x = sample['x'].to(device)
                     p = model.get_repr(x)
                     y_pred.append(p.cpu().detach().numpy())
-            # predictions = predictions + y_pred
+             
             predictions.append(np.concatenate(y_pred))  
             labels.append(data[data[BATCH] == dataset][LABELS].values)  
             batches.append(data[data[BATCH] == dataset][BATCH].values)  
 
         predictions = np.concatenate(predictions)
-        labels = np.concatenate(labels) # NEW  
-        batches = np.concatenate(batches) # NEW  
+        labels = np.concatenate(labels)  
+        batches = np.concatenate(batches)  
         return predictions, labels, batches 
 
     def get_filtered_prediction(self, data, frac=0.05):
@@ -358,39 +358,46 @@ class JindLib:
         else:
             preds = np.argmax(y_pred, axis=1)
 
-        raw_acc = (y_true == np.argmax(y_pred, axis=1)).mean()
-        ind = preds != self.n_classes
+        indexes = list(itertools.takewhile(lambda item: item[0] != 'Unassigned', self.class2num.items()))
+        indexes = [value for key, value in indexes]
 
-        # pred_acc = (y_true[ind] == preds[ind]).mean()
-        matching_values = (y_true[ind] == preds[ind])
+        mask = np.isin(y_true, indexes)
+        y_true_subset = y_true[mask]
+        preds_subset = preds[mask]
+
+        raw_acc = (y_true_subset == np.argmax(y_pred, axis=1)[mask]).mean()  
+        ind = preds_subset != self.n_classes  
+
+        matching_values = (y_true_subset[ind] == preds_subset[ind])  
         if np.any(matching_values):
             pred_acc = matching_values.mean()
         else:
             pred_acc = 0
         
         filtered = 1 - np.mean(ind)
-        total_count = len(y_true)
-        correctly_classified = len(preds[y_true == preds])
-        rejected = len(preds[preds == self.n_classes])
+        total_count = len(y_true_subset)
+        correctly_classified = len(preds_subset[y_true_subset == preds_subset])  
+        rejected = len(preds_subset[preds_subset == self.n_classes]) 
         misclassified = total_count - (correctly_classified + rejected)
 
         arranged_labels = np.arange(0, max(np.max(y_true) + 1, np.max(preds) + 1, self.n_classes + 1))
         cm = confusion_matrix(y_true, preds, labels=arranged_labels)
         
-        # remove 'unassigned' from true label rows in cm
-        cm = np.delete(cm, (self.n_classes), axis=0)
+        # If the sum of the last vector is greater than 0, nothing is deleted since some samples have unassigned true labels (we're not talking aboyt preds).
+        # Otherwise, the row corresponding to self.n_classes ('unassigned) in cm is deleted.
+        condition_met = np.sum(cm[-1]) == 0  
+        if condition_met: 
+            # remove 'unassigned' from true label rows in cm
+            cm = np.delete(cm, (self.n_classes), axis=0)  
+        
         # remove extra column in pred label columns
         if new_labels:
             cm = np.delete(cm, range(self.n_classes + 1, self.n_classes + 1 + len(new_labels)), axis=1)
-        # if cm.shape[1] > (self.n_classes + 1): # version akash
-        #     cm = np.delete(cm, (self.n_classes + 1), axis=1)
-
+        
         # The code calculates the Average Precision (AP) values using the compute_ap function. This function iterates through each class 
         # in y_pred and calculates the corresponding AP using the calc_pr function. The AP values are stored in the aps array.
-            
-        # aps = np.zeros((len(cm), 1))
         aps = np.zeros((cm.shape[1]-1, 1)) # can be cell-types in the cm not presented in the model training. Remove these from the calculations
-        aps[:self.n_classes] = np.array(compute_ap(y_true, y_pred)).reshape(-1, 1)
+        aps[:self.n_classes] = np.array(compute_ap(y_true_subset, y_pred[mask])).reshape(-1, 1)
         mAP = np.true_divide(aps.sum(), (aps != 0).sum()) # mean average precision 
 
         if self.config['cmat_print_counts']:
@@ -400,15 +407,20 @@ class JindLib:
             cm = np.concatenate([cm, total_actuals], axis=1)
             total_predictions = cm.sum(axis=0, keepdims=True)
             cm = np.concatenate([cm, total_predictions])
-            # cm[cm.shape[0] - 1][cm.shape[1] - 1] = 0 ??? why, makes no sense
-            class_true_labels = [key for key in true_labels_class2num.keys() if key != 'Unassigned'] + ['Total Counts']
-            class_pred_labels = list(self.class2num.keys()) + ['Total Counts']
+            if condition_met: 
+                class_true_labels = [key for key in true_labels_class2num.keys() if key != 'Unassigned'] + ['Total Counts']  
+            else:  
+                class_true_labels = [key for key in true_labels_class2num.keys()] + ['Total Counts']  
+            class_pred_labels = list(self.class2num.keys()) + ['Total Counts']  
         else:
             values_format = '.2g'
             cm = np.concatenate([normalize(cm, normalize='true'), aps], axis=1)
-            class_true_labels = [key for key in true_labels_class2num.keys() if key != 'Unassigned'] + ['Novel'] + ['AP']
-            class_pred_labels = list(self.class2num.keys()) + ['Novel'] + ['AP']
-
+            if condition_met:  
+                class_true_labels = [key for key in true_labels_class2num.keys() if key != 'Unassigned'] + ['Novel'] + ['AP']  
+            else:  
+                class_true_labels = [key for key in true_labels_class2num.keys()] + ['Novel'] + ['AP']  
+            class_pred_labels = list(self.class2num.keys()) + ['Novel'] + ['AP']  
+            
         eval_result = 'T {} #Rej {} ({:.1f}%) corrct {} (raw {:.3f}% eff {:.3f}%) incorrct {} mAP {:.3f}% '.format(total_count,
                 rejected, filtered*100, correctly_classified, raw_acc*100, pred_acc*100, misclassified, mAP*100)
         print('[JindLib][Evaluate] Accuracy: {} {}'.format(eval_result, set(data[BATCH])))
@@ -479,7 +491,7 @@ class JindLib:
         probs_train = self.val_stats['pred']
      
         for top_klass in range(self.n_classes):
-            ind = (np.argmax(probs_train, axis=1) == top_klass)  # & (y_train == top_klass)
+            ind = (np.argmax(probs_train, axis=1) == top_klass)   
 
             if np.sum(ind) != 0:
                 best_prob = np.max(probs_train[ind], axis=1)
@@ -507,7 +519,7 @@ class JindLib:
             reduced_feats)
         return embeddings
 
-    def plot_tsne_of_batches(self, data, plot_name):
+    def plot_tsne_of_batches(self, data, plot_name, predicted_label=None):
         if not self.config['plot_tsne']:
             return
 
@@ -515,7 +527,18 @@ class JindLib:
         
         predictions, labels, batches = self.get_encoding(data)  
         emb = self.get_TSNE(predictions)  
-        df = pd.DataFrame({'tSNE_x': emb[:, 0], 'tSNE_y': emb[:, 1], 'Labels': labels, 'Batch': batches}) # NEW MODIFIED
+
+        if predicted_label is not None: # using the prediction data do a tsne betwen predictions and cell evaluation
+            print("\n[JindLib][plot_TSNE_of_batches] Analyze prediction results in target data")
+        
+            raw_predictions = predicted_label['raw_predictions']
+            assignment = predicted_label['predictions'].apply(lambda x: 'Unassigned' if x == 'Unassigned' else 'Assigned')
+            evaluation = predicted_label.apply(lambda row: 'Correct' if row['raw_predictions'] == row['labels'] else 'Miss', axis=1)
+            df = pd.DataFrame({'tSNE_x': emb[:, 0], 'tSNE_y': emb[:, 1], 'Raw_Predictions': raw_predictions, 'Assignment': assignment, 'Evaluation': evaluation})
+
+        else: # Regular tsne to see alignment between labeled batches and target batch 
+            df = pd.DataFrame({'tSNE_x': emb[:, 0], 'tSNE_y': emb[:, 1], 'Labels': labels, 'Batch': batches})
+
         plot_and_save_tsne(df, self.path, plot_name)
         self.plot_embeddings[plot_name] = self.plot_embeddings.get(plot_name, {})
         self.plot_embeddings[plot_name]['tsne'] = df
@@ -676,9 +699,8 @@ class JindLib:
                 if rej_frac < best_rej_frac:
                     print(f"Updated Rejected cells from {best_rej_frac:.3f} to {rej_frac:.3f}")
                     best_rej_frac = rej_frac
-                    torch.save(model_for_test_dataset.state_dict(),
-                               self.path + "/target_{}_bestbr.pth".format(test_dataset_name))
-
+                    torch.save(model_for_test_dataset.state_dict(), self.path + "/target_{}_bestbr.pth".format(test_dataset_name))
+                    
                 dry_epochs = 0
                 if count >= max_count:
                     break
@@ -688,7 +710,7 @@ class JindLib:
                     print("Loss not improving, stopping alignment")
                     break
 
-        if not os.path.isfile(self.path + "/target_{}_bestbr".format(test_dataset_name)):
+        if not os.path.isfile(self.path + "/target_{}_bestbr.pth".format(test_dataset_name)):
             print("Warning: Alignment did not succeed properly, try changing the gdecay or ddecay!")
             torch.save(model_for_test_dataset.state_dict(), self.path + "/target_{}_bestbr.pth".format(test_dataset_name))
 
@@ -756,7 +778,7 @@ class JindLib:
             if s <= best_loss:
                 best_loss = s
                 torch.save(model.state_dict(), self.path + "/{}_bestbr.pth".format(test_dataset_name))
-                #self.model[test_dataset_name] = model
+                self.model[test_dataset_name] = model # NEW
                 self.evaluate(data)
 
         # Finally keep the best model
@@ -832,8 +854,6 @@ class JindLib:
             y_pred = np.concatenate(y_pred)
             y_true = np.concatenate(y_true)
 
-            # if s < 0.0001 and epoch>5:
-            #     break
             val_acc = (y_true == y_pred.argmax(axis=1)).mean()
             print("Validation Accuracy {:.4f}".format(val_acc))
             if val_acc >= best_val_acc:
@@ -866,9 +886,6 @@ class JindLib:
     def ftune(self, data, config, datasets_to_train=None, cmat=True):  
         datasets_to_train = list(set(data[BATCH])) if datasets_to_train is None else datasets_to_train
         test_dataset_name = datasets_to_train[len(datasets_to_train)-1]
-         
-        for i in datasets_to_train:
-            batch_data = data[data[BATCH] == i]
              
         metric = config['metric']
         torch.manual_seed(config['seed'])
@@ -956,9 +973,10 @@ class JindLib:
                 torch.save(model_copies[test_dataset_name].state_dict(), self.path + "/{}_bestbr_ftune.pth".format(test_dataset_name))
 
                 if cmat:
-                # Plot validation confusion matrix
                     self.plot_cfmt(self.val_stats['pred'], self.val_stats['true'], 0.05, f'val_cfmtftune_{test_dataset_name}.pdf')
                  
+                self.model = self.update_model_copies(self.model, model_copies[test_dataset_name], test_dataset_name) # NEW
+
                 for dataset_evaluate in set(data[BATCH]):
                     self.evaluate(data[data[BATCH] == dataset_evaluate])
 

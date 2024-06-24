@@ -32,14 +32,10 @@ def load_and_process_data(path, batch_col, labels_col, config={}):
 #sc.pl.scatter(adata, basis='umap', color=[labels_col, batch_col], frameon=False, show=False)
 #plt.savefig("/".join(path.split('/')[0:4])+'/umap_batch_labels.png', bbox_inches="tight")
  
-################################## de aquí para abajo versión reproducibility
 
 def load_brain_scatlas_atac(path):
     adata = sc.read_h5ad(path)
     data = adata.to_df()
-    
-    
-    
     data["labels"] = adata.obs.celltype.values.tolist()
     data["batch"] = data.index.str.split('_').str[:3].str.join('_')
     batches = data['batch'].unique()

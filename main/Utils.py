@@ -130,30 +130,6 @@ def create_umap_from_dataframe(dataframe, batch_col, labels_col, path):
     plot_and_save_tsne(df2, path, plot_name='tsne_common_labels_initial_experiment_samples')
 
 
-# def plot_and_save_tsne(dataframe, path, plot_name):
-#     df = dataframe
-#     # Plot genes of the batches in different colours
-#     plt.figure(figsize=(10, 8))
-#     order = sorted(list(set(df['Labels'])))
-#     print(f'Order:: {order}')
-#     batches = sorted(list(set(df['Batch'])))
-#     print(f'batches:: {batches}')
-#     g = sns.scatterplot(x='tSNE_x', y='tSNE_y', hue='Labels', data=df, hue_order=order, style='Batch', style_order=batches, s=80)
-#     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15, markerscale=2.)
-#     plt.title("{}_labels".format(plot_name))
-#     plt.tight_layout()
-#     plt.savefig("{}/{}_labels.pdf".format(path, plot_name))
-#     # Plot batches in different colour
-#     plt.figure(figsize=(8, 7))
-#     hue_order = sorted(list(set(df['Batch'])), key=str.casefold)
-#     g = sns.scatterplot(x='tSNE_x', y='tSNE_y', hue='Batch', data=df, hue_order=hue_order, s=80)
-#     plt.legend(fontsize=15, markerscale=2.)
-#     plt.title("{}_batches".format(plot_name))
-#     plt.tight_layout()
-#     plt.savefig("{}/{}_batches.pdf".format(path, plot_name))
-
-
-
 def preprocess(data, count_normalize=True, log_transformation=True, target_sum=1e4):
     batches = data['batch']
     labels = data['labels']
@@ -228,7 +204,7 @@ class ConfusionMatrixPlot:
         # self.displabelsy.remove("Unassigned") 
         self.title = title
 
-    def plot(self, include_values=True, cmap='viridis', xticks_rotation='vertical', values_format=None, ax=None, fontsize=13):
+    def plot(self, include_values=True, cmap='viridis', xticks_rotation='vertical', values_format=None, ax=None, fontsize=10):
         import matplotlib.pyplot as plt
 
         if ax is None:
@@ -317,8 +293,6 @@ def plot_cmat_timeline(conf_matrix_list, path, timeline_plot_name, num_datasets=
     fig.subplots_adjust(top=0.95)
     fig.savefig("{}/{}.pdf".format(path, timeline_plot_name))
     
-    #joseba
-    print(target_title)
     raw_acc_per = re.search(r'raw (\d+\.\d+)%', target_title).group(1)
     eff_acc_per = re.search(r'eff (\d+\.\d+)%', target_title).group(1)
     mAP_per = re.search(r'mAP (\d+\.\d+)%', target_title).group(1)
@@ -327,26 +301,61 @@ def plot_cmat_timeline(conf_matrix_list, path, timeline_plot_name, num_datasets=
 
 def plot_and_save_tsne(dataframe, path, plot_name):
     df = dataframe
-    # Plot genes of the batches in different colours
-    plt.figure(figsize=(10, 8))
-    order = sorted(list(set(df['Labels'])))
-    print(f'Order:: {order}')
-    batches = sorted(list(set(df['Batch'])))
-    print(f'batches:: {batches}')
-    g = sns.scatterplot(x='tSNE_x', y='tSNE_y', hue='Labels', data=df, hue_order=order, style='Batch', style_order=batches, s=80)
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=15, markerscale=2.)
-    plt.title("{}_labels".format(plot_name))
-    plt.tight_layout()
-    plt.savefig("{}/{}_labels.pdf".format(path, plot_name))
-    # Plot batches in different colour
-    plt.figure(figsize=(8, 7))
-    hue_order = sorted(list(set(df['Batch'])), key=str.casefold)
-    g = sns.scatterplot(x='tSNE_x', y='tSNE_y', hue='Batch', data=df, hue_order=hue_order, s=80)
-    plt.legend(fontsize=15, markerscale=2.)
-    plt.title("{}_batches".format(plot_name))
-    plt.tight_layout()
-    plt.savefig("{}/{}_batches.pdf".format(path, plot_name))
+    
+    fig_size = (14, 12)   
+    marker_size = 100   
+    legend_fontsize = 11 
+    marker_scale = 1.5   
 
+    # Plot genes of the batches in different colours
+    if 'Labels' in df.columns:
+        plt.figure(figsize=fig_size)
+        order = sorted(list(set(df['Labels'])))
+        print(f'Order:: {order}')
+        batches = sorted(list(set(df['Batch'])))
+        print(f'batches:: {batches}')
+        g = sns.scatterplot(x='tSNE_x', y='tSNE_y', hue='Labels', data=df, hue_order=order, style='Batch', style_order=batches, s=marker_size)
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=legend_fontsize, markerscale=marker_scale)
+        plt.title("{}_labels".format(plot_name), fontsize=legend_fontsize + 2)
+        plt.tight_layout()
+        plt.savefig("{}/{}_labels.pdf".format(path, plot_name))
+        plt.close()
+
+    # Plot batches in different colours
+    if 'Batch' in df.columns:
+        plt.figure(figsize=fig_size)
+        hue_order = sorted(list(set(df['Batch'])), key=str.casefold)
+        g = sns.scatterplot(x='tSNE_x', y='tSNE_y', hue='Batch', data=df, hue_order=hue_order, s=marker_size)
+        plt.legend(fontsize=legend_fontsize, markerscale=marker_scale)
+        plt.title("{}_batches".format(plot_name), fontsize=legend_fontsize + 2)
+        plt.tight_layout()
+        plt.savefig("{}/{}_batches.pdf".format(path, plot_name))
+        plt.close()
+
+    # Plot predictions in different colours
+    if 'Raw_Predictions' in df.columns and 'Assignment' in df.columns and 'Evaluation' in df.columns:
+        df['Evaluation'] = pd.Categorical(df['Evaluation'], categories=['Correct', 'Miss'], ordered=True) # NEW
+        markers_dict = {'Correct': 'o', 'Miss': 'X'}
+        # markers_list = ['o', 'X']  
+        unique_assignments = df['Assignment'].unique()
+        num_unique_assignments = len(unique_assignments)
+        sizes_list = [marker_size, marker_size/3][:num_unique_assignments]
+
+        plt.figure(figsize=fig_size)
+        g = sns.scatterplot(
+            x='tSNE_x', y='tSNE_y', 
+            hue='Raw_Predictions', 
+            style='Evaluation',   
+            markers=markers_dict, #markers_list, NEW
+            size='Assignment',  
+            sizes=sizes_list, 
+            data=df
+        )
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=legend_fontsize, markerscale=marker_scale)
+        plt.title("{}".format(plot_name), fontsize=legend_fontsize + 2)
+        plt.tight_layout()
+        plt.savefig("{}/{}.pdf".format(path, plot_name))
+        plt.close()
 
 def compute_ap(gts, preds):
     aps = []

@@ -40,6 +40,7 @@ def perform_jind_training(jind_obj, train_data, test_data, config):
     plot_name_initial = "{}_initial.pdf".format(base_plot_name)
     plot_name_after_GAN = "{}_GAN.pdf".format(base_plot_name)
     plot_name_after_fineTune = "{}_ftune.pdf".format(base_plot_name)
+    plot_name_prediction_results = "analyze_predictions"
 
     if test_data[LABELS].nunique() > 1:
         jind_obj.evaluate(test_data, name="{}_{}.pdf".format(test_data[BATCH][0], "initial")) # in GAN training we want to evaluate just the TARGET DATA
@@ -64,6 +65,9 @@ def perform_jind_training(jind_obj, train_data, test_data, config):
     # Adding the original labels back to the predictions
     if test_data['labels'].nunique() > 1:
         predicted_label['labels'] = test_data[LABELS].values
+        # Analyze results in test data if we have the labels (if tsne = true in config)
+        jind_obj.plot_tsne_of_batches(test_data, plot_name_prediction_results, predicted_label)
+
     return predicted_label
     
 def save_results_to_sheets(jind, target_dataset_name, mode, config=None):
@@ -169,9 +173,9 @@ class JindWrapper:
                     train_data = self.train_data[self.train_data[BATCH] == self.source_dataset_name]
             
             # T-sne after training labeled batches
-            base_plot_name = "train{}-test{}".format(self.train_dataset_names, set(self.target_data[BATCH]))  
-            plot_name = "{}_adapt_retrain.pdf".format(base_plot_name)  
-            self.jind_obj.plot_tsne_of_batches(self.train_data.append(self.target_data), plot_name)  
+            # base_plot_name = "train{}-test{}".format(self.train_dataset_names, set(self.target_data[BATCH]))  
+            # plot_name = "{}_adapt_retrain.pdf".format(base_plot_name)  
+            # self.jind_obj.plot_tsne_of_batches(self.train_data.append(self.target_data), plot_name)  
             
             # Save Trained Model object!
             print("\n[JindWrapper] Save Trained Model and val_stats object ")
