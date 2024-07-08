@@ -68,22 +68,6 @@ cd cluster
 sbatch main.sh
 ```
 
-En `OUTPUT_PATH` se guardan los siguientes outputs:
-- predicted_label_test_data.xlsx : tabla con las predicciones sobre el target data, indicando para cada una de las muestras la probabilidad calculada por el modelo de que pertenezca a cada uno de los celltypes. Se indica en la columna `raw_predictions`, la celltype con mayor probabilidad antes de aplicar el threshold particula para cada celltype y `predictions` el celltype prediction después de aplicar el filtrado.
-- Los modelos particulares finales entrenados por cada batch anotado en formato .pt y un target.pth con el modelo entrenado para el target batch. También encontrarás varios modelos .pth guardados pero estos son ficheros intermedios usados por el método como proxy para guardar modelos intermedios durante el proceso de entrenamiento y tuneado del classificador y el encoder. No hacer uso de ellos. Además, en val_statds_trained_model.json se guardan las predicciones sobre el test de validacion a la hora de entrenar el classifier que se utilizan poder computar los thresholds.
-- los resultados de la peformance del modelo sobre el source batch, los datasets intermedios y el validation set después de entrenar el clasificador y hacer los distintos ftuning mediante matrices de confusion en el que se indica el número de muestras, cuantas han sido rejected y cuantas correctamente predichas con los porcentajes del accuracy antes (raw) y después de aplicar el threshold (eff), cuantas incorrectas y la mean average precision (mAP) por celltype.
-
-Para el source batch se muestran las matrices de confusión después de entrenar el classifier, después del tuning y después del ultimo tuning (retrain). Para el resto de batches intermedios se indica los resultados antes de alinear las muestras al espacio latent del source ("initial"), después del alineamiento ("adapt") y tras el ultimo tuning del classifier y el encoder ("retrain"). En caso de que el target batch disponga de labels también se sacarían las matrices de confusión antes de entrenar el generative Adversarial network (GAN), después de entrenar la GAN y después del tuning del encoder y el clasificador usando las muestras con mayor confianza. El historial de estos matrices de confusión también se guarda en un fichero pdf con esta forma: train['nombre_source_batch', 'number_inter_batches]-test{'nombre_target_batch}.pdf.
-
-- Por defecto, el usuario también dispondrá de tsne plots con la proyección coloreado por batch o labels del espacio latente generado al pasar las muestras por el encoder en 4 distintos momentos:
-
-1) tras entrenar el encoder y el classifier con el source batch ("after_train_classifier").
-2) después de eliminar el batch effect de cada uno de los batches intermedios y antes de inferir sobre el target batch ("initial").
-3) después de alinear el target batch al latent code del source con el entrenamiento de la GAN.
-4) después de hacer el tuning del encoder y el classifier para el target batch.
-
-Re-using an already trained modeL: se puede reusar los modelos ya entrenados simplemente indicando en un nuevo run como indicado en el Option 1 y Option 2 el mismo `OUTPUT_PATH` donde están guardados los modelos, JIND-Multi los detectará y cargará los modelos con los pesos ya entrenados para inferir sobre el nuevo target batch. 
-
 In the `OUTPUT_PATH`, the following outputs are saved:
 
 - A table with the predictions on the target data (**predicted_label_test_data.xlsx**:), indicating for each sample the probability calculated by the model for each cell type. The `raw_predictions` column shows the cell type with the highest probability before applying the cell type-specific threshold, and the predictions column shows the predicted cell type after filtering.
