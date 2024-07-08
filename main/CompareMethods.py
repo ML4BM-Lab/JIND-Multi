@@ -147,6 +147,7 @@ if __name__ == "__main__":
     parser.add_argument('--NUM_FEATURES', type=int, default=5000, help='Optional. Number of genes to consider for modeling, default is 5000')
     parser.add_argument('--MIN_CELL_TYPE_POPULATION', type=int, default=100, help='Optional. For each batch, the minimum number of cells per cell type necessary for modeling. If this requirement is not met in any batch, the samples belonging to this cell type are removed from all batches')
     parser.add_argument('--N_TRIAL', type=int, required=True, help='Number of the trial experiment')
+    
     args = parser.parse_args()
 
     # Setting the training configuration (you can modify more things here)
@@ -157,25 +158,5 @@ if __name__ == "__main__":
     data = load_and_process_data(args.PATH, args.BATCH_COL, args.LABELS_COL, config) 
     # Execute trial
     run_results = main(args, data, args.N_TRIAL) 
-
-
-#brain_scatlas_atac: python Main.py --PATH '../resources/data/brain_scatlas_atac/Integrated_Brain_norm.h5ad' --BATCH_COL 'SAMPLE_ID' --LABELS_COL 'peaks_snn_res.0.3' --SOURCE_DATASET_NAME   --TARGET_DATASET_NAME  --OUTPUT_PATH '../output/method_comparation/brain_scatlas_atac'  --NUM_FEATURES 50000 --MIN_CELL_TYPE_POPULATION 100 --N_TRIAL
-
-# margaret:
-# Test Dataset
-# pancreas:    python create_method_comparation_results.py -dt pancreas -s 0 -t 3 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -bl "dropped" "endothelial"
-# human_brain: python create_method_comparation_results.py -dt brain_neurips -s C4 -t C7 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt
-# nsclc:       python create_method_comparation_results.py -dt nsclc_lung -s Donor5 -t Donor2  -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt
-# bmmc_atac:   python create_method_comparation_results.py -dt bmmc_atac -s s4d8 -t s3d3 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt
-
-# atac2: nohup python 
-    # heart: nohup python create_method_comparation_results.py -dt heart_atac2 -s heart_sample_39 -t heart_sample_14 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt 0 > /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi/main/logs/heart_atac2_try0.log &
-    # cerebrum: nohup python create_method_comparation_results.py -dt cerebrum_atac2 -s cerebrum_sample_6 -t cerebrum_sample_66 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt 0 > /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi/main/logs/cerebrum_atac2_try0.log &
-    # kidney: python create_method_comparation_results.py -dt kidney_atac2 -s kidney_sample_3 -t kidney_sample_67 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt 0
-    # liver: python create_method_comparation_results.py -dt liver_atac2 -s liver_sample_35 -t liver_sample_9 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt 0
-    
-# Extra Dataset
-# breast:      python create_method_comparation_results.py -dt breast -s CID4495 -t CID3838 -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt
-# test:        python create_method_comparation_results.py -dt test -s Source -t Target -p /home/jsanchoz/data/josebas/JIND_Iterative/JIND-continual_integration/jind_multi -nt
 
  

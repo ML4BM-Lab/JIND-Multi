@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --partition=general
-#SBATCH --qos=test
+#SBATCH --qos=regular
 #SBATCH --job-name=main
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=50gb
+#SBATCH --mem=200gb
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --output=/scratch/jsanchoz/JIND-Multi/logs/main.out
@@ -15,30 +15,18 @@
 SCRIPT_DIR="$PWD"
 
 module load Python
-source activate /home/jsanchoz/.conda/envs/jind
+source activate /home/jsanchoz/.conda/envs/jind # here insert path to your environment 
 
-# Arguments for the Python script
-# PANCREAS
-DATA_PATH="../resources/data/pancreas/pancreas.h5ad"  # Example value, replace with your desired h5ad data path
+# NEURIPS
+DATA_PATH="../resources/data/human_brain/All_human_brain.h5ad"  # path to your data 
 BATCH_COL="batch"
-LABELS_COL="celltype"
-SOURCE_DATASET_NAME="0"
-TARGET_DATASET_NAME="3"     
-OUTPUT_PATH="$SCRIPT_DIR/../output/pancreas"
-TRAIN_DATASETS_NAMES="['0', '1', '2']"
+LABELS_COL="label"
+SOURCE_DATASET_NAME="C4"
+TARGET_DATASET_NAME="C7"
+TRAIN_DATASETS_NAMES="['C4', 'AD2', 'ADx1', 'ADx2', 'ADx4']" 
 NUM_FEATURES=5000
-MIN_CELL_TYPE_POPULATION=5
-
-# BRAIN_SCATLAS_ATAC
-# DATA_PATH="../resources/data/brain_scatlas_atac/Integrate_Brain_norm_ctrl_caud.h5ad"  # Example value, replace with your desired h5ad data path
-# BATCH_COL="SAMPLE_ID"
-# LABELS_COL="peaks_snn_res.0.3"
-# SOURCE_DATASET_NAME="scATAC_CTRL_CAUD_06_0615_BRAIN"
-# TARGET_DATASET_NAME="scATAC_CTRL_CAUD_14_1018_BRAIN"
-# OUTPUT_PATH="$SCRIPT_DIR/../output/brain_scatlas_atac"
-# TRAIN_DATASETS_NAMES="['scATAC_CTRL_CAUD_06_0615_BRAIN', 'scATAC_CTRL_CAUD_09_1589_BRAIN']"
-# NUM_FEATURES=50000
-# MIN_CELL_TYPE_POPULATION=100
+MIN_CELL_TYPE_POPULATION=100
+OUTPUT_PATH="$SCRIPT_DIR/../results/brain_neurips" # path where you want to save the results
 
 # Display the arguments before executing
 echo "Running Python script with the following parameters:"
@@ -62,4 +50,6 @@ python -u "$SCRIPT_DIR/../main/Main.py" \
     --OUTPUT_PATH "$OUTPUT_PATH" \
     --TRAIN_DATASETS_NAMES "$TRAIN_DATASETS_NAMES" \
     --NUM_FEATURES "$NUM_FEATURES" \
-    --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION"
+    --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION" \
+    --USE_CUDA # Eliminate this line JOSEBA
+    

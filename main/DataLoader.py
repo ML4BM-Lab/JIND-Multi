@@ -1,18 +1,21 @@
 import scanpy as sc
 import pandas as pd
 import numpy as np
+import ast
 import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import Dataset
 from Utils import dimension_reduction, preprocess, filter_cells, create_scanpy_embeddings, create_scanpy_umap, create_umap_from_dataframe
 from ConfigLoader import get_config
 
-def load_and_process_data(path, batch_col, labels_col, config={}):
+def load_and_process_data(args, config={}):
     # 1) Read ann object and add batch and labels columns
     config = get_config(config)['data']
-    adata = sc.read(path)
+    selected_batches = list(dict.fromkeys([args.SOURCE_DATASET_NAME] + ast.literal_eval(args.TRAIN_DATASETS_NAMES) + [args.TARGET_DATASET_NAME]))
+    adata = sc.read(args.PATH)
+    adata = adata[adata.obs[args.BATCH_COL].isin(selected_batches)]
     data = adata.to_df()
-    data['batch'] = adata.obs[batch_col]
-    data['labels'] = adata.obs[labels_col]
+    data['batch'] = adata.obs[args.BATCH_COL]
+    data['labels'] = adata.obs[args.LABELS_COL]
     # 2) Select commun genes and labels between batches
     batches = data['batch'].unique()
     common_genes = list(set.intersection(*[set(data[data['batch'] == batch].columns) for batch in batches]))
