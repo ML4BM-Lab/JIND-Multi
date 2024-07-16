@@ -5,7 +5,7 @@ We introduce JIND-Multi, an extension of the JIND framework for the automated an
 The proposed approach JIND-Multi can leverage a large number of annotated datasets, e.g., those that compose an atlas, making the annotation of unlabeled datasets more precise and with lower rejection rates (unassigned cells). We provide an efficient implementation of JIND-Multi that is publicly available and ready to use by the community.
 
 <p align="center">
-    <img src="JIND.pdf" width="700" alt="PDF Image">
+    <img src="https://github.com/ML4BM-Lab/JIND-Multi/blob/master/JIND.png" width="700">
 </p>
 
 ## Prerequisites
