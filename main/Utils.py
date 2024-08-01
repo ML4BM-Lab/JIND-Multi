@@ -75,22 +75,20 @@ def load_val_stats(start_dir, target_file):
                     return None
     return None
 
-# def match_labels_with_source(data, source_dataset_name):
-#     source_labels = set(data[data['batch'] == source_dataset_name]['labels'])
-#     for batch in list(set(data.batch.unique())):
-#         if batch != source_dataset_name:
-#             # Labels of the actual dataset
-#             batch_labels = set(data[data['batch'] == batch]['labels']) 
-#             # Intersect labels between source dataset and intermediate dataset
-#             intersect_labels = batch_labels.intersection(source_labels) 
-#             # remove the labels that don´t appear in the source
-#             data.loc[data['batch'] == batch, 'labels'] = data.loc[data['batch'] == batch, 'labels'].apply(lambda x: x if x in intersect_labels else None)
-#             data.dropna(subset=['labels'], inplace=True)
-#     print('[Utils][match_labels_with_source] Common labels: Labels of the datasets are now contained in the source dataset labels - DONE')
-  
-#     for batch in set(data['batch']):
-#         print("[Utils][match_labels_with_source] {}: ".format(batch), data[data['batch'] == batch].shape, *np.unique(data[data['batch'] == batch]['labels'], return_counts=True))
-#     return data
+def remove_pth_files(directory):
+    if os.path.exists(directory):
+        # Iterate over all files in the directory
+        for filename in os.listdir(directory):
+            # Check if the file has the .pth extension
+            if filename.endswith('.pth'):
+                file_path = os.path.join(directory, filename)
+                try:
+                    # Remove the file
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting {file_path}: {e}")
+    else:
+        print(f"The directory {directory} does not exist.")
 
 def create_scanpy_embeddings(adata, basis, batch, labels, path):
     with plt.rc_context({"figure.figsize": (7, 6), "figure.dpi": (300), "font.size": 4}): #"font.size": 4

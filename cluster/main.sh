@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --output=/scratch/jsanchoz/JIND-Multi/logs/main.out
 #SBATCH --mail-type=END
-#SBATCH --mail-user=jsanchoz@unav.es
+#SBATCH --mail-user=jsanchoz@unav.es 
 ###SBATCH --gres=gpu:rtx3090:1
 
 # Script directory

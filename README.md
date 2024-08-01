@@ -24,7 +24,6 @@ conda install pytorch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1 pytorch-cud
 
 conda install pytorch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1 pytorch-cuda=11.7 numpy=1.18.4 seaborn=0.11.2 matplotlib=3.2.1 pandas=1.3.5 scikit-learn=0.22.2 tqdm=4.43.0 scanpy=1.7.1 -c pytorch -c nvidia -c conda-forge
 
-
 ###
 conda env create -f environment.yml
 conda activate jind
@@ -64,7 +63,7 @@ where,
 - **`SOURCE_DATASET_NAME`**: (string) Optional. name of the source batch. If no batch is specified, JIND-Multi will select as source batch the sample that produces the least amount of rejected cells on the target batch when used as source in JIND (i.e., without additional intermediate batches).
 - **`TARGET_DATASET_NAME`**: (string) Name of the target batch to which transfer the annotations from the rest of the datasets.
 - **`OUTPUT_PATH`**: (string) Path where the model performance results will be stored. 
-- **`PRETRAINED_MODEL_PATH`**: (string) Optional. This argument specifies the path to a folder containing pre-trained models. If this path is provided, the script will use the models from this folder instead of training new ones. The folder should contain model files that are compatible with the script's requirements. If this argument is not provided or left empty, the script will proceed to train a new model from scratch based on the provided data.
+- **`PRETRAINED_MODEL_PATH`**: (string) Optional. This argument specifies the path to a folder containing pre-trained models. If this path is provided, JIND-Multi will use the models from this folder instead of training new ones to infer on the new target batch. The folder should contain model files `.pt` format and a `.json` file containing the predictions on the validation test set used to compute the thresholds. If this argument is not provided or left empty, the script will proceed to train a new model from scratch based on the provided data.
 - **`TRAIN_DATASETS_NAMES`**: (string) Optional. This setting allows to specify the order of intermediate datasets used for training. The source batch should not be included here. If no specific order is provided, the model will train on the intermediate datasets in the order they appear in the data.
 - **`NUM_FEATURES`**: (int) Optional. Number of genes to consider for modeling, default is 5000.
 - **`MIN_CELL_TYPE_POPULATION`**: (int) Optional. For each batch, the minimum necessary number of cells per cell type to train. If this requirement is not met in any batch, the cells belonging to this cell type are discarded from all batches, the default is 100 cells.
@@ -84,7 +83,7 @@ sbatch main.sh
 In the `OUTPUT_PATH`, the following outputs are saved:
 
 - A table with the predictions for each cell on the target data (**predicted_label_test_data.xlsx**:), indicating for each cell the probability calculated by the model for each cell type. The `raw_predictions` column shows the cell type with the highest probability before applying the cell type-specific threshold, and the predictions column shows the predicted cell type after filtering.
-The final trained models for each annotated batch are stored `.pt` format, and a `target.pth` file with the trained model for the target batch. ___Additionally, several `.pth` models are saved, which are used as proxies for storing intermediate models during the training and tuning process.___ Do not use these intermediate files. The file `val_stats_trained_model.json` contains predictions on the validation test set used to compute the thresholds.
+The final trained models for each annotated batch are stored `.pt` format (saved in `trained_models` folder), and a `target.pth` file with the trained model for the target batch. The file `val_stats_trained_model.json` contains predictions on the validation test set used to compute the thresholds.
 
 - The model performance results on the source batch, intermediate datasets, and validation set after training the classifier and the fine-tuning steps. These results include confusion matrices indicating the number of cells, how many cells were assigned as ___Unknown___, and how many were correctly predicted with the accuracy percentages before (raw) and after applying the threshold (eff), as well as the incorrect predictions and the mean average precision (mAP) per cell type.
 For the source batch, confusion matrices are shown after training the classifier and the fine-tuning process. For the intermediate batches, results are shown before aligning the samples to the latent space of the source ("initial"), after alignment ("adapt"), and after the fine-tuning of the classifier and encoder to evaluate the batch aligmnent. If the target batch has labels, for performance pourposes, confusion matrices are also provided before and after the batch removal process, and after fine-tuning classifier using the most confident cells. The history of these confusion matrices is also saved in a PDF file named train[source_batch_name, number_inter_batches]-test[target_batch_name].pdf.
@@ -95,10 +94,6 @@ For the source batch, confusion matrices are shown after training the classifier
 2) After removing the batch effect from each intermediate batch and before inferring on the target batch ("initial").
 3) After aligning the target batch to the latent code of the source with the GAN training.
 4) After tuning the encoder and classifier for the target batch.
-
-## Re-using an Already Trained Model
-___Already trained models can be reused by specifying the same `OUTPUT_PATH` in a new run as indicated in `Option 1` and `Option 2`.___
-___JIND-Multi will detect and load the models with the pre-trained weights to infer on the new target batch.___
 
 ## Example
 In the Example folder, there is an example of executing JIND-Multi, explaining in detail the data processing and the internal functioning of the method.

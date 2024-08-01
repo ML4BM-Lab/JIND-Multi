@@ -1,7 +1,7 @@
 from datetime import datetime
 from ConfigLoader import get_config
 from JindLib import JindLib
-from Utils import plot_timeline, preprocess, dimension_reduction, filter_cells, plot_cmat_timeline
+from Utils import plot_cmat_timeline, remove_pth_files
 import re
 import pandas as pd
 import os
@@ -177,9 +177,9 @@ class JindWrapper:
             # plot_name = "{}_adapt_retrain.pdf".format(base_plot_name)  
             # self.jind_obj.plot_tsne_of_batches(self.train_data.append(self.target_data), plot_name)  
             
-            # Save Trained Model object!
+            # Save Trained Model object
             print("\n[JindWrapper] Save Trained Model and val_stats object ")
-            model_output_path = os.path.join(self.path, f'../../results')
+            model_output_path = os.path.join(self.path, 'trained_models')
 
             # Ensure the directory exists
             os.makedirs(model_output_path, exist_ok=True)
@@ -189,11 +189,12 @@ class JindWrapper:
                 torch.save(model_copy.state_dict(), os.path.join(model_output_path, f'{key}.pt'))
 
             # Save tha val stats calculated
-            # Convert NumPy arrays to Python lists
             converted_val_stats = {key: val.tolist() for key, val in self.jind_obj.val_stats.items()}
-            # Save the converted data to JSON file
             with open(os.path.join(model_output_path, 'val_stats_trained_model.json'), 'w') as f:
                 json.dump(converted_val_stats, f)
+
+            # Remove several `.pth` models  used as proxies for storing intermediate models during the training and tuning process
+            remove_pth_files(self.path)
             
         else:
             print("\n[JindWrapper] Using an already trained classifier")

@@ -29,22 +29,25 @@ def main(args, config):
                     )
                         
     # 4) Train Jind Multi
-    file_paths = find_saved_models(args.PRETRAINED_MODEL_PATH, train_data) # Check if there is already a trained model available
-    if file_paths:
-        print('[main] Warning: Trained Models detected')
-        print(f'[main] File Paths: {file_paths}')
-        # Load the trained models
-        print("[main] e.2) Load the trained models")
-        model = load_trained_models(file_paths, train_data, args.SOURCE_DATASET_NAME)
-        # Load the val_stats
-        print("[main] e.3) Load the val_stats")
-        val_stats = load_val_stats(args.OUTPUT_PATH, 'val_stats_trained_model.json') 
-        # Do Jind
-        print("[main] f) Do Jind")
-        jind.train(target_data=test_data, model=model, val_stats=val_stats)
-
+    if args.PRETRAINED_MODEL_PATH:
+        print('[main] Loading pre-trained models from specified path')
+        file_paths = find_saved_models(args.PRETRAINED_MODEL_PATH, train_data) # Check if there is already a trained model available
+        if file_paths:
+            print('[main] Warning: Trained Models detected')
+            print(f'[main] File Paths: {file_paths}')
+            # Load the trained models
+            print("[main] Load the trained models")
+            model = load_trained_models(file_paths, train_data, args.SOURCE_DATASET_NAME)
+            # Load the val_stats
+            print("[main] Load the val_stats")
+            val_stats = load_val_stats(args.OUTPUT_PATH, 'val_stats_trained_model.json') 
+            # Do JIND
+            jind.train(target_data=test_data, model=model, val_stats=val_stats)
+        else:
+            print('[main] No pre-trained models found at the specified path. Please check the path and try again.')
+            raise FileNotFoundError(f'No pre-trained models found at the specified path: {args.PRETRAINED_MODEL_PATH}. Please check the path and try again.')
     else:
-        print('[main] Warning: Training JIND Multi with this data for the first time')
+        print('[main] No pre-trained model path provided. Training JIND Multi with the provided data for the first time.')
         jind.train(target_data=test_data)
 
 if __name__ == "__main__":
@@ -71,5 +74,3 @@ if __name__ == "__main__":
     config['ftune']['cuda'] = args.USE_GPU  
     print(f'USE_GPU: {args.USE_GPU}')
     main(args, config)
-
-#--Model if empty, creates a new one, if not, reuses an older one.
