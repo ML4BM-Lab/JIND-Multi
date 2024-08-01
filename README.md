@@ -18,6 +18,14 @@ The proposed approach JIND-Multi can leverage a large number of annotated datase
 <!-- ```bash
 git clone https://github.com/ML4BM-Lab/JIND-Multi.git
 cd JIND-Multi
+
+conda create --name jind python=3.8
+conda install pytorch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1 pytorch-cuda=11.7 -c pytorch -c nvidia
+
+conda install pytorch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1 pytorch-cuda=11.7 numpy=1.18.4 seaborn=0.11.2 matplotlib=3.2.1 pandas=1.3.5 scikit-learn=0.22.2 tqdm=4.43.0 scanpy=1.7.1 -c pytorch -c nvidia -c conda-forge
+
+
+###
 conda env create -f environment.yml
 conda activate jind
 ``` ESTO HAY QUE VERLO BIEN --> 

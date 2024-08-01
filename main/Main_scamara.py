@@ -40,6 +40,12 @@ def heatmap_celltypes(data, path_save, label_name='labels', database_name='v3'):
     plt.savefig(path_save+f'/{database_name}_heatmap_label_count_batches.png')
     plt.close()
 
+def make_label_names_consistent(data, labels_col):
+    if labels_col == 'JIND_Res_1': # args.LABELS_COL:
+        data['labels'] = data['labels'].replace('CD4', 'CD4 cells')
+        data['labels'] = data['labels'].replace('CD8', 'CD8 cells')
+    return data
+
 def load_scamara_data(args):
     path = args.PATH
     path_save = args.OUTPUT_PATH + f'/{args.LABELS_COL}'
@@ -62,7 +68,7 @@ def load_scamara_data(args):
     data_v3['batch'] = adata_v3.obs['Product_norm']
     data_v3['labels'] = adata_v3.obs[args.LABELS_COL]
     
-    # Filtrar las filas donde 'labels' no sea igual a 'Ribosomal enriched'  
+    # Filtrar las filas donde 'labels' no sea igual a 'Ribosomal enriched'. El dataset anotado queremos saber todo.  
     data_v3 = data_v3[data_v3['labels'] != 'Unknown']
     
     # Common genes and labels in annotated batches
@@ -98,7 +104,8 @@ def load_scamara_data(args):
         #data_v4.drop(columns=['ground_truth'], inplace=True)
     
     data_v4['labels'] = adata_v4.obs[args.LABELS_COL] 
-    data_v4['labels'] = data_v3['labels'].replace('Unknown', 'Unassigned')
+    data_v4['labels'] = data_v4['labels'].replace('Unknown', 'Unassigned')
+    data_v4 = make_label_names_consistent(data=data_v4, labels_col=args.LABELS_COL)
     batches_v4 = data_v4['batch'].unique()
     
     # Common genes in no-annotated batches
@@ -157,7 +164,10 @@ def main(args):
         print("[main] c) Processing data")
         data = preprocess(data, count_normalize=config['count_normalize'], log_transformation=config['log_transformation'])
         data = dimension_reduction(data, num_features=config['num_features'])
-        data = filter_cells(data, min_cell_type_population=5)
+        
+        # In this case we just wanna filter train sample cells
+        data_train = filter_cells(data[~(data.batch == target_batch)], min_cell_type_population=args.MIN_CELL_TYPE_POPULATION)  
+        data = pd.concat([data_train, data[data.batch == target_batch]])
         data = data.reindex(sorted(data.columns), axis=1)  # Reorder columns
         
         # d) Initialize JindWrapper object

@@ -27,6 +27,8 @@ TRAIN_DATASETS_NAMES="['C4', 'AD2', 'ADx1', 'ADx2', 'ADx4']"
 NUM_FEATURES=5000
 MIN_CELL_TYPE_POPULATION=100
 OUTPUT_PATH="$SCRIPT_DIR/../results/brain_neurips" # path where you want to save the results
+PRETRAINED_MODEL_PATH=""  # Specify the path to the pre-trained model if you want to reuse one
+USE_GPU=True  
 
 # Display the arguments before executing
 echo "Running Python script with the following parameters:"
@@ -39,17 +41,38 @@ echo "OUTPUT_PATH: $OUTPUT_PATH"
 echo "TRAIN_DATASETS_NAMES: $TRAIN_DATASETS_NAMES"
 echo "NUM_FEATURES: $NUM_FEATURES"
 echo "MIN_CELL_TYPE_POPULATION: $MIN_CELL_TYPE_POPULATION"
+echo "PRETRAINED_MODEL_PATH: $PRETRAINED_MODEL_PATH"
+echo "USE_GPU: $USE_GPU"
 
-# Execute the Python script
-python -u "$SCRIPT_DIR/../main/Main.py" \
-    --PATH "$DATA_PATH" \
-    --BATCH_COL "$BATCH_COL" \
-    --LABELS_COL "$LABELS_COL" \
-    --SOURCE_DATASET_NAME "$SOURCE_DATASET_NAME" \
-    --TARGET_DATASET_NAME "$TARGET_DATASET_NAME" \
-    --OUTPUT_PATH "$OUTPUT_PATH" \
-    --TRAIN_DATASETS_NAMES "$TRAIN_DATASETS_NAMES" \
-    --NUM_FEATURES "$NUM_FEATURES" \
-    --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION" \
-    --USE_CUDA # Eliminate this line JOSEBA
+# Execute the Python script with conditional model path
+if [ -z "$PRETRAINED_MODEL_PATH" ]; then
+    echo "PRETRAINED_MODEL_PATH is empty"
+    # If PRETRAINED_MODEL_PATH is empty, run without the --PRETRAINED_MODEL_PATH argument
+    python -u "$SCRIPT_DIR/../main/Main.py" \
+        --PATH "$DATA_PATH" \
+        --BATCH_COL "$BATCH_COL" \
+        --LABELS_COL "$LABELS_COL" \
+        --SOURCE_DATASET_NAME "$SOURCE_DATASET_NAME" \
+        --TARGET_DATASET_NAME "$TARGET_DATASET_NAME" \
+        --OUTPUT_PATH "$OUTPUT_PATH" \
+        --TRAIN_DATASETS_NAMES "$TRAIN_DATASETS_NAMES" \
+        --NUM_FEATURES "$NUM_FEATURES" \
+        --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION" \
+        --USE_GPU "$USE_GPU"
+else
+    # If PRETRAINED_MODEL_PATH is set, pass it to the --PRETRAINED_MODEL_PATH argument
+    echo "PRETRAINED_MODEL_PATH is not empty"
+    python -u "$SCRIPT_DIR/../main/Main.py" \
+        --PATH "$DATA_PATH" \
+        --BATCH_COL "$BATCH_COL" \
+        --LABELS_COL "$LABELS_COL" \
+        --SOURCE_DATASET_NAME "$SOURCE_DATASET_NAME" \
+        --TARGET_DATASET_NAME "$TARGET_DATASET_NAME" \
+        --OUTPUT_PATH "$OUTPUT_PATH" \
+        --TRAIN_DATASETS_NAMES "$TRAIN_DATASETS_NAMES" \
+        --NUM_FEATURES "$NUM_FEATURES" \
+        --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION" \
+        --PRETRAINED_MODEL_PATH "$PRETRAINED_MODEL_PATH"
+        --USE_GPU "$USE_GPU" \
+fi
     
