@@ -45,6 +45,7 @@ python -u Main.py \
   --TRAIN_DATASETS_NAMES "['AD2', 'ADx1', 'ADx2', 'ADx4']" \
   --NUM_FEATURES 5000 \
   --MIN_CELL_TYPE_POPULATION 100 \
+  --PRETRAINED_MODEL_PATH "/path/to/pretrained_model_folder" \
   --USE_CUDA True
 ```
 
@@ -55,7 +56,7 @@ where,
 - **`SOURCE_DATASET_NAME`**: (string) Optional. name of the source batch. If no batch is specified, JIND-Multi will select as source batch the sample that produces the least amount of rejected cells on the target batch when used as source in JIND (i.e., without additional intermediate batches).
 - **`TARGET_DATASET_NAME`**: (string) Name of the target batch to which transfer the annotations from the rest of the datasets.
 - **`OUTPUT_PATH`**: (string) Path where the model performance results will be stored. 
-<!-- AND trained model ???. -->
+- **`PRETRAINED_MODEL_PATH`**: (string) Optional. This argument specifies the path to a folder containing pre-trained models. If this path is provided, the script will use the models from this folder instead of training new ones. The folder should contain model files that are compatible with the script's requirements. If this argument is not provided or left empty, the script will proceed to train a new model from scratch based on the provided data.
 - **`TRAIN_DATASETS_NAMES`**: (string) Optional. This setting allows to specify the order of intermediate datasets used for training. The source batch should not be included here. If no specific order is provided, the model will train on the intermediate datasets in the order they appear in the data.
 - **`NUM_FEATURES`**: (int) Optional. Number of genes to consider for modeling, default is 5000.
 - **`MIN_CELL_TYPE_POPULATION`**: (int) Optional. For each batch, the minimum necessary number of cells per cell type to train. If this requirement is not met in any batch, the cells belonging to this cell type are discarded from all batches, the default is 100 cells.
