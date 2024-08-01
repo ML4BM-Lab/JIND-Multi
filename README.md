@@ -46,7 +46,7 @@ python -u Main.py \
   --NUM_FEATURES 5000 \
   --MIN_CELL_TYPE_POPULATION 100 \
   --PRETRAINED_MODEL_PATH "/path/to/pretrained_model_folder" \
-  --USE_CUDA True
+  --USE_GPU True
 ```
 
 where,
