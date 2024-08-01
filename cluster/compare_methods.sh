@@ -24,6 +24,7 @@ OUTPUT_PATH="$SCRIPT_DIR/../output/pancreas"
 TRAIN_DATASETS_NAMES="['0', '1', '2']"
 NUM_FEATURES=5000
 MIN_CELL_TYPE_POPULATION=5
+USE_GPU=True  
 
 # Loop to run the Python script 10 times with different N_TRIAL values
 for N_TRIAL in {0..9}
@@ -39,6 +40,7 @@ do
   echo "N_TRIAL: $N_TRIAL"
   echo "NUM_FEATURES: $NUM_FEATURES"
   echo "MIN_CELL_TYPE_POPULATION: $MIN_CELL_TYPE_POPULATION"
+  echo "USE_GPU: $USE_GPU"
 
   # Execute the Python script
   python -u "$SCRIPT_DIR/../main/CompareMethods.py" \
@@ -50,5 +52,6 @@ do
     --OUTPUT_PATH "$OUTPUT_PATH" \
     --N_TRIAL "$N_TRIAL" \
     --NUM_FEATURES "$NUM_FEATURES" \
-    --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION"
+    --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION" \
+    --USE_GPU "$USE_GPU"
 done

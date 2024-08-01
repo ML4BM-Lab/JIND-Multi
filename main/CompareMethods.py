@@ -8,6 +8,7 @@ import os
 import timeit
 import datetime
 import torch
+import ast
 
 def remove_pth_files(folder_path):
     for root, _, files in os.walk(folder_path):
@@ -56,7 +57,6 @@ def main(args, data, trial):
     # remove actual runs' .pth (if you want to save space)
     remove_pth_files(path_out + f'/Single-trial_{trial}')  
     print('[create_method_comparation_results] Run Jind Single Mode ... -> DONE')
-
 
     ### 2) Run Multi and Combine iteratively adding another batch
     intermediate_batches = data[~data['batch'].isin([args.SOURCE_DATASET_NAME, args.TARGET_DATASET_NAME])].batch.unique().tolist()
@@ -147,13 +147,18 @@ if __name__ == "__main__":
     parser.add_argument('--NUM_FEATURES', type=int, default=5000, help='Optional. Number of genes to consider for modeling, default is 5000')
     parser.add_argument('--MIN_CELL_TYPE_POPULATION', type=int, default=100, help='Optional. For each batch, the minimum number of cells per cell type necessary for modeling. If this requirement is not met in any batch, the samples belonging to this cell type are removed from all batches')
     parser.add_argument('--N_TRIAL', type=int, required=True, help='Number of the trial experiment')
-    
+    parser.add_argument('--USE_GPU', type=ast.literal_eval, default=True, help='Optional. Use CUDA if available (True/False), default is True')
     args = parser.parse_args()
 
     # Setting the training configuration (you can modify more things here)
     config = get_config()
     config['data']['num_features'] = args.NUM_FEATURES
     config['data']['min_cell_type_population'] = args.MIN_CELL_TYPE_POPULATION
+    config['train_classifier']['cuda'] = args.USE_GPU  
+    config['GAN']['cuda'] = args.USE_GPU  
+    config['ftune']['cuda'] = args.USE_GPU  
+    print(f'USE_GPU: {args.USE_GPU}')
+
     # Load Data and Normalize
     data = load_and_process_data(args.PATH, args.BATCH_COL, args.LABELS_COL, config) 
     # Execute trial
