@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import ast
 import matplotlib.pyplot as plt
-from torch.utils.data import Dataset
+#from torch.utils.data import Dataset
 from .utils import dimension_reduction, preprocess, filter_cells, create_scanpy_embeddings, create_scanpy_umap, create_umap_from_dataframe
 from .config_loader import get_config
 
