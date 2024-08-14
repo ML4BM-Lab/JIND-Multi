@@ -5,10 +5,10 @@ import json
 import pandas as pd
 from torch import optim
 from torch.autograd import Variable
-from Utils import ConfusionMatrixPlot, compute_ap, normalize, plot_and_save_tsne
+from .utils import ConfusionMatrixPlot, compute_ap, normalize, plot_and_save_tsne
 from sklearn.model_selection import train_test_split
 from tqdm.auto import tqdm
-from Models import Classifier, Discriminator, ClassifierBig
+from .models import Classifier, Discriminator, ClassifierBig
 from matplotlib import pyplot as plt
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
@@ -16,8 +16,8 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import pickle
-from ConfigLoader import get_config
-from DataLoader import DataLoaderCustom
+from .config_loader import get_config
+from .data_loader import DataLoaderCustom
 
 class JindLib:
     global MODEL_WIDTH, LDIM, GLDIM, BATCH, LABELS

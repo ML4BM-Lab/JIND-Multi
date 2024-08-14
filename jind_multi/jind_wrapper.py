@@ -1,7 +1,7 @@
 from datetime import datetime
-from ConfigLoader import get_config
-from JindLib import JindLib
-from Utils import plot_cmat_timeline, remove_pth_files
+from .config_loader import get_config
+from .jindlib import JindLib
+from .utils import plot_cmat_timeline, remove_pth_files
 import re
 import pandas as pd
 import os
@@ -69,21 +69,6 @@ def perform_jind_training(jind_obj, train_data, test_data, config):
         jind_obj.plot_tsne_of_batches(test_data, plot_name_prediction_results, predicted_label)
 
     return predicted_label
-    
-def save_results_to_sheets(jind, target_dataset_name, mode, config=None):
-    target_results = [b.title.split('Total ')[1] for a,b in jind.jind_obj.conf_matrix if target_dataset_name in a]
-    res = [jind.path.split('/').pop(), [jind.source_dataset_name] + jind.intermediate_dataset_names, target_dataset_name, mode, target_results[0].split('_')[0]]
-    for result in target_results:
-        res.extend(re.findall('\ (.*?)\_', result))
-    res.append(config)
-
-    gc = gspread.authorize(GoogleCredentials.get_application_default())
-    worksheet = gc.open('A new spreadsheet').sheet1
-    rows = worksheet.get_all_values()
-    rows.append(res)
-    df = pd.DataFrame.from_records(rows[1:],columns=rows[0])
-    set_with_dataframe(worksheet, df)
-    df
 
 def run_multi_mode(data, train_dataset_names, target_dataset_name, path, config={}, source_dataset_name=None):
     print("[JindWrapper] MULTI MODE. source = {}. target = {}".format(train_dataset_names, target_dataset_name))

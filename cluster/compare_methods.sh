@@ -43,7 +43,7 @@ do
   echo "USE_GPU: $USE_GPU"
 
   # Execute the Python script
-  python -u "$SCRIPT_DIR/../main/CompareMethods.py" \
+  python -u "$SCRIPT_DIR/compare_methods.py" \
     --PATH "$DATA_PATH" \
     --BATCH_COL "$BATCH_COL" \
     --LABELS_COL "$LABELS_COL" \

@@ -9,10 +9,10 @@ import re
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import os
-from Models import Classifier, ClassifierBig
+from .models import Classifier, ClassifierBig
 import json
 import torch
-from ConfigLoader import get_config
+from .config_loader import get_config
 
 def find_saved_models(path_saved_models, train_data):
     # List to store the paths of saved model files

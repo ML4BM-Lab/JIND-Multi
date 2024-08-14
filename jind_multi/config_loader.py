@@ -3,7 +3,7 @@ def get_default_config():
         "ftune_intermediate": True, # default was True
         "retrain_intermediate": True, # default was True. Con scamara voy a probar a dejar esto en False a ver.
         'align_target_to_source': False, 
-        "plot_tsne": True,
+        "plot_tsne": False,
         "cmat_print_counts": True,
         'save_results_to_sheets': True,
         "train_classifier": {

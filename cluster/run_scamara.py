@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
 from torch.utils.data import DataLoader, Dataset
-from Utils import dimension_reduction, preprocess, filter_cells, create_scanpy_embeddings, create_scanpy_umap, create_umap_from_dataframe, find_saved_models, load_trained_models, load_val_stats
-from JindWrapper import JindWrapper
-from JindLib import JindLib
-from DataLoader import load_data
+from jind_multi.utils import dimension_reduction, preprocess, filter_cells, create_scanpy_embeddings, create_scanpy_umap, create_umap_from_dataframe, find_saved_models, load_trained_models, load_val_stats
+from jind_multi.jind_wrapper import JindWrapper
+from jind_multi.jindlib import JindLib
+from jind_multi.data_loader import load_data
+from jind_multi.config_loader import get_config
 import argparse
-from ConfigLoader import get_config
 import gc
 import os
 from glob import glob

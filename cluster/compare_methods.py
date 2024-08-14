@@ -1,6 +1,6 @@
-from JindWrapper import JindWrapper, run_single_mode, run_multi_mode, run_combined_mode
-from DataLoader import load_and_process_data
-from ConfigLoader import get_config
+from jind_multi.jind_wrapper import run_single_mode, run_multi_mode, run_combined_mode
+from jind_multi.data_loader import load_and_process_data
+from jind_multi.config_loader import get_config
 import argparse
 import pandas as pd
 import numpy as np
