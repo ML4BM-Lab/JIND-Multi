@@ -29,7 +29,7 @@ The datasets to reproduce the results presented in the manuscript are available 
 # Executing JIND-Multi
 There are two options to execute the JIND-Multi framework: 
 * Running the Python script 
-* Submitting a job to a HPC queue (recommended for reproducing the 10 fold cross validations from the manuscript)
+* Submitting a job to a HPC queue
 
 ### Option 1: The Python Script 
 For executing JIND-Multi on the `Brain Neurips` dataset, we would do it as follows:
@@ -90,12 +90,28 @@ For the source batch, confusion matrices are shown after training the classifier
 In the `notebooks` folder, there is an example of executing JIND-Multi, explaining in detail the data processing and the internal functioning of the method.
 
 # Compare JIND Methods
-To compare the annotation performance of JIND, JIND-Multi, and JIND-Combined (merging all annotated datasets into one, without correcting for batch effect) for any target dataset with known true labels, you can execute the `compare_methods.sh` script.
+To compare the annotation performance of JIND, JIND-Multi, and JIND-Combined (which merges all annotated datasets into a single one without correcting for batch effects) on any target dataset with known true labels, you have two options:
+
+* Run the Python script directly.
+* Submit a job to an HPC queue: you can execute the compare_methods.sh script.
+
+```bash
+compare-methods --PATH "/path/to/data/pancreas/pancreas.h5ad" \
+               --BATCH_COL "batch" \
+               --LABELS_COL "celltype" \
+               --SOURCE_DATASET_NAME "0" \
+               --TARGET_DATASET_NAME "3" \
+               --OUTPUT_PATH "../results/pancreas_compare_methods" \
+               --NUM_FEATURES 5000 \
+               --MIN_CELL_TYPE_POPULATION 5 \
+               --N_TRIAL 0 \
+               --USE_GPU True
+```
+where,
+- **`N_TRIAL`**: (int) A numeric identifier assigned to the experiment.
 
 # Additional Information
-In the `./jind_multi` folder, you will find an extra README explaining in more detail each of the Python scripts of the jind_multi package.
-
-
+In the ./jind_multi folder, you will find an extra README that provides a detailed explanation of each of the Python scripts in the `jind_multi` package.
 
 
 

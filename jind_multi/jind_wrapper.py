@@ -102,6 +102,8 @@ def run_single_mode(data, source_dataset_name, target_dataset_name, path, config
 class JindWrapper:
     def __init__(self, train_data, output_path, train_dataset_names=None, config=get_config(), source_dataset_name=None):
         self.train_dataset_names = train_dataset_names if train_dataset_names is not None else list(set(train_data[BATCH]))
+        if source_dataset_name and source_dataset_name not in self.train_dataset_names:
+            self.train_dataset_names.insert(0, source_dataset_name)
         self.path = output_path
         self.config = get_config(user_conf=config)
         self.train_data = train_data[train_data[BATCH].isin(self.train_dataset_names)]

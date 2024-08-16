@@ -21,6 +21,12 @@ def parse_args():
 def main():
     args = parse_args()
     config = get_config()  # Load configuration
+    # Set up training configuration (you can modify more things here)
+    config['data']['num_features'] = args.NUM_FEATURES
+    config['data']['min_cell_type_population'] = args.MIN_CELL_TYPE_POPULATION
+    config['train_classifier']['cuda'] = args.USE_GPU  
+    config['GAN']['cuda'] = args.USE_GPU  
+    config['ftune']['cuda'] = args.USE_GPU  
     run_main(args, config)  # Run the main logic
 
 if __name__ == '__main__':

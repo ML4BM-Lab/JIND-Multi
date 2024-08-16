@@ -267,6 +267,7 @@ def plot_timeline(plot_embeddings, path, timeline_plot_name):
     fig.tight_layout()
     fig.subplots_adjust(top=0.95)
     fig.savefig("{}/{}.pdf".format(path, timeline_plot_name))
+    plt.close(fig1)
 
 def plot_cmat_timeline(conf_matrix_list, path, timeline_plot_name, num_datasets=1, cmat_print_counts=False):
     # conf_matrix_list is list of maps of confusion matrix. [('dataset1_initial',conf_mat1), ('dataset1_GAN',conf_mat2)]
@@ -290,7 +291,7 @@ def plot_cmat_timeline(conf_matrix_list, path, timeline_plot_name, num_datasets=
     fig.tight_layout()
     fig.subplots_adjust(top=0.95)
     fig.savefig("{}/{}.pdf".format(path, timeline_plot_name))
-    
+    plt.close(fig)
     raw_acc_per = re.search(r'raw (\d+\.\d+)%', target_title).group(1)
     eff_acc_per = re.search(r'eff (\d+\.\d+)%', target_title).group(1)
     mAP_per = re.search(r'mAP (\d+\.\d+)%', target_title).group(1)

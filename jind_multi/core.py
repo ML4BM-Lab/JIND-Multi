@@ -14,6 +14,7 @@ def run_main(args, config):
     # 3) Create the Jind Multi object
     if args.TRAIN_DATASETS_NAMES:
         train_datasets_names = ast.literal_eval(args.TRAIN_DATASETS_NAMES) # If it's not None, parse it as a list
+
     else:
         train_datasets_names = args.TRAIN_DATASETS_NAMES   
 
