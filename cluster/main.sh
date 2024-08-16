@@ -4,18 +4,18 @@
 #SBATCH --job-name=main
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=200gb
+#SBATCH --gres=gpu:rtx3090:1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --output=/scratch/jsanchoz/JIND-Multi/logs/main.out
+#SBATCH --output=/scratch/your_username/JIND-Multi/logs/main.out  # Update this path
 #SBATCH --mail-type=END
-#SBATCH --mail-user=jsanchoz@unav.es 
-###SBATCH --gres=gpu:rtx3090:1
+#SBATCH --mail-user=your_email@example.com  # Update this email address
 
 # Script directory
 SCRIPT_DIR="$PWD"
 
 module load Python
-source activate /home/jsanchoz/.conda/envs/jind # here insert path to your environment 
+source activate /path/to/your/environment  # Insert the path to your environment
 
 # NEURIPS
 DATA_PATH="../resources/data/human_brain/All_human_brain.h5ad"  # path to your data 
@@ -26,7 +26,7 @@ TARGET_DATASET_NAME="C7"
 TRAIN_DATASETS_NAMES="['C4', 'AD2', 'ADx1', 'ADx2', 'ADx4']" 
 NUM_FEATURES=5000
 MIN_CELL_TYPE_POPULATION=100
-OUTPUT_PATH="$SCRIPT_DIR/../results/brain_neurips" # path where you want to save the results
+OUTPUT_PATH="$SCRIPT_DIR/../results/brain_neurips"  # Path where you want to save the results
 PRETRAINED_MODEL_PATH=""  # Specify the path to the pre-trained model if you want to reuse one
 USE_GPU=True  
 
