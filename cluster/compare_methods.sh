@@ -4,15 +4,18 @@
 #SBATCH --job-name=compare_methods
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=500gb
+#SBATCH --gres=gpu:rtx3090:1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --output=/scratch/jsanchoz/JIND-Multi/logs/compare_methods_%j.out
+#SBATCH --output=/scratch/your_username/JIND-Multi/logs/compare_methods_%j.out # Update this path
 #SBATCH --mail-type=END
-#SBATCH --mail-user=jsanchoz@unav.es
-#--gres=gpu:rtx3090:1
+#SBATCH --mail-user=your_email@example.com  # Update this email address
 
 # Script directory
 SCRIPT_DIR="$PWD"
+
+module load Python
+source activate /path/to/your/environment  # Insert the path to your environment
 
 # Arguments for the Python script
 DATA_PATH="../resources/data/pancreas/pancreas.h5ad"  # Example value, replace with your desired h5ad data path
