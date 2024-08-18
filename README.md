@@ -96,16 +96,30 @@ To compare the annotation performance of JIND, JIND-Multi, and JIND-Combined (wh
 * Submit a job to an HPC queue: you can execute the compare_methods.sh script.
 
 ```bash
-compare-methods --PATH "/path/to/data/pancreas/pancreas.h5ad" \
-               --BATCH_COL "batch" \
-               --LABELS_COL "celltype" \
-               --SOURCE_DATASET_NAME "0" \
-               --TARGET_DATASET_NAME "3" \
-               --OUTPUT_PATH "../results/pancreas_compare_methods" \
-               --NUM_FEATURES 5000 \
-               --MIN_CELL_TYPE_POPULATION 5 \
-               --N_TRIAL 0 \
-               --USE_GPU True
+
+DATA_PATH="/path/to/data/pancreas/pancreas.h5ad"
+BATCH_COL="batch"
+LABELS_COL="celltype"
+SRC_DATASET="0"
+TGT_DATASET="3"
+OUT_DIR="/path/to/save/results"
+NUM_FEAT=5000
+MIN_POP=5
+USE_GPU=True 
+N_TRIAL=0
+
+echo "Running compare-methods with N_TRIAL: $N_TRIAL"
+compare-methods --PATH "$DATA_PATH" \
+                --BATCH_COL "$BATCH_COL" \
+                --LABELS_COL "$LABELS_COL" \
+                --SOURCE_DATASET_NAME "$SRC_DATASET" \
+                --TARGET_DATASET_NAME "$TGT_DATASET" \
+                --OUTPUT_PATH "$OUT_DIR" \
+                --NUM_FEATURES "$NUM_FEAT" \
+                --MIN_CELL_TYPE_POPULATION "$MIN_POP" \
+                --N_TRIAL "$N_TRIAL" \
+                --USE_GPU "$USE_GPU"
+
 ```
 where,
 - **`N_TRIAL`**: (int) A numeric identifier assigned to the experiment.

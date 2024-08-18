@@ -64,7 +64,7 @@ def run_comparison(args, data, trial):
     train_dataset_names = [args.SOURCE_DATASET_NAME] 
    
     for i, batch in enumerate(intermediate_batches):
-    #for i in range(0,len(intermediate_batches)):
+   
         ### a) Run Jind Multi Mode
         train_dataset_names.append(batch)
         print('[Run Comparison][Jind Multi]', train_dataset_names)
@@ -80,17 +80,17 @@ def run_comparison(args, data, trial):
         torch.cuda.empty_cache() # free space in GPU
 
         run_jind_multi = {
-                        'num_train_batches': len(train_dataset_names),
-                        'rej%': rejected_per,
-                        'raw_acc%': raw_acc_per,
-                        'eff_acc%': eff_acc_per,
-                        'mAP%': mAP_per
-                        }
+                       'num_train_batches': len(train_dataset_names),
+                       'rej%': rejected_per,
+                       'raw_acc%': raw_acc_per,
+                       'eff_acc%': eff_acc_per,
+                       'mAP%': mAP_per
+                       }
 
         run_time_jind_multi = {
-                                'num_train_batches': len(train_dataset_names),
-                                'time': str(duration)
-                                }
+                               'num_train_batches': len(train_dataset_names),
+                               'time': str(duration)
+                               }
         jind_multi_results = jind_multi_results.append(run_jind_multi, ignore_index=True)
         time_jind_multi = time_jind_multi.append(run_time_jind_multi, ignore_index=True)
         remove_pth_files(path_out + f'/Multi-trial_{trial}/' + f'train_inter_{i+1}_set')
@@ -99,24 +99,24 @@ def run_comparison(args, data, trial):
         print('[Run Comparison][Jind Combine]', train_dataset_names)
         start_time = timeit.default_timer()
         _, raw_acc_per, eff_acc_per, mAP_per, rejected_per = run_combined_mode(
-                                                        data=data, 
-                                                        source_dataset_names=train_dataset_names, 
+                                                       data=data, 
+                                                   source_dataset_names=train_dataset_names, 
                                                         target_dataset_name=args.TARGET_DATASET_NAME, 
-                                                        path=path_out + f'/Combine-trial_{trial}/' + f'train_inter_{i+1}_set')
+                                                       path=path_out + f'/Combine-trial_{trial}/' + f'train_inter_{i+1}_set')
         torch.cuda.empty_cache() # free space in gpu
         duration = datetime.timedelta(seconds=timeit.default_timer() - start_time)
        
         run_jind_combine = {
-                            'num_train_batches': len(train_dataset_names),
+                           'num_train_batches': len(train_dataset_names),
                             'rej%': rejected_per,
-                            'raw_acc%': raw_acc_per,
-                            'eff_acc%': eff_acc_per,
-                            'mAP%': mAP_per
-                            }   
+                           'raw_acc%': raw_acc_per,
+                           'eff_acc%': eff_acc_per,
+                           'mAP%': mAP_per
+                           }   
         run_time_jind_combine = {
                             'num_train_batches': len(train_dataset_names),
                             'time': str(duration)
-                            }
+                           }
      
         jind_combine_results = jind_combine_results.append(run_jind_combine, ignore_index=True)
         time_jind_combine = time_jind_combine.append(run_time_jind_combine, ignore_index=True)
