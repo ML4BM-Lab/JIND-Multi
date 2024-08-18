@@ -17,7 +17,7 @@ The proposed approach JIND-Multi can leverage a large number of annotated datase
 ## Installation
 ```bash
 git clone https://github.com/ML4BM-Lab/JIND-Multi.git
-cd JIND
+cd JIND-Multi
 conda create -n jind python=3.7.16 
 conda activate jind
 pip install -e .
