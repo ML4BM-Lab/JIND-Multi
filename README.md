@@ -124,6 +124,16 @@ compare-methods --PATH "$DATA_PATH" \
 where,
 - **`N_TRIAL`**: (int) A numeric identifier assigned to the experiment.
 
+## Input Arguments Information
+
+| Dataset        | Type       | File                                      | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | TRAIN_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
+|----------------|------------|-------------------------------------------|----------------|---------------------------|---------------------|---------------------|-------------------------------------------------------------------------------------|--------------------------|
+| Pancreas       | scRNA-seq   | "pancreas.h5ad"                           | "batch"        | "celltype"                 | "0"                 | "3"                 | "['0', '1', '2']"                                                                    | 5                        |
+| NSCLC Lung     | scRNA-seq   | "NSCLC_lung_NORMALIZED_FILTERED.h5ad"     | "Donor"        | "predicted_labels_majority"| "Donor 5"           | "Donor 2"           | "['Donor 0', 'Donor 1', 'Donor 3', 'Donor 4', 'Donor 6']"                            | 20                       |
+| Neurips Brain  | scRNA-seq   | "All_human_brain.h5ad"                    | "batch"        | "label"                    | "C4"                | "C7"                | "['AD2', 'ADx1', 'ADx2', 'ADx4']"                                                    | 100                      |
+| BMMC           | scATAC-seq  | "data_multiome_annotated_BMMC_ATAC.h5ad"  | "batch"        | "cell_type"                | "s4d8"              | "s3d3"              | "['s1d1', 's1d2', 's1d3', 's2d1', 's2d4', 's2d5', 's3d10', 's4d1']"                 | 18                       |
+
+
 # Additional Information
 In the ./jind_multi folder, you will find an extra README that provides a detailed explanation of each of the Python scripts in the `jind_multi` package.
 

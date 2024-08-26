@@ -44,7 +44,7 @@ def get_default_config():
             "count_normalize": True,
             "log_transformation": True,
             "num_features": 5000, 
-            "min_cell_type_population": 5, # by default put at least 100 always. 
+            "min_cell_type_population": 100, # by default put at least 100 always. 
             # 20 for "NSCLC_lung", 5 for "pancreas" when using source 3, 100 for "human_brain", 18 for "bmmc_ATAC", 100 for all ATAC2 tissues (liver atac2 35)
 
             "max_cells_for_dataset": 50000,

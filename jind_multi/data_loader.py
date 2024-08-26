@@ -8,7 +8,6 @@ from torch.utils.data import Dataset
 from .utils import dimension_reduction, preprocess, filter_cells, create_scanpy_embeddings, create_scanpy_umap, create_umap_from_dataframe
 from .config_loader import get_config
 
-
 def load_and_process_data(args, config={}):
     # Read and process the data
     config = get_config(config)['data']
