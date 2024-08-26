@@ -1,6 +1,7 @@
 import scanpy as sc
 import pandas as pd
 import numpy as np
+import warnings
 import ast
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset
@@ -11,7 +12,12 @@ from .config_loader import get_config
 def load_and_process_data(args, config={}):
     # Read and process the data
     config = get_config(config)['data']
-    adata = sc.read(args.PATH)
+    try:
+        adata = sc.read(args.PATH)
+    except OSError as e:
+        # Add a warning and raise an error for the specific issue
+        warnings.warn(f"Failed to read the H5AD file at {args.PATH}. The file may be corrupted or incomplete.")
+        raise RuntimeError(f"Error reading H5AD file: {e}")
     # Filter and verify the data
     data = filter_and_verify_data(adata, args)
    # Process the data
