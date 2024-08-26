@@ -1,20 +1,39 @@
 # JIND-Multi  
 <!-- #### Publication:   -->
-We introduce JIND-Multi, an extension of the JIND framework for the automated annotation of single-cell RNA sequencing (scRNA-Seq) data ([Goyal et al., 2022](https://academic.oup.com/bioinformatics/article/38/9/2488/6543609)), that allows transferring cell-type labels from several annotated datasets. Notably, JIND-Multi is also applicable for the annotation of scATAC-Seq data. Moreover, similarly to its predecessor, JIND-Multi has the option to mark cells as "unassigned" if the model does not produce reliable predictions, i.e., below some pre-computed cell type specific thresholds.
-
-The proposed approach JIND-Multi can leverage a large number of annotated datasets, e.g., those that compose an atlas, making the annotation of unlabeled datasets more precise and with lower rejection rates (unassigned cells). We provide an efficient implementation of JIND-Multi that is publicly available and ready to use by the community.
 
 <p align="center">
-    <img src="https://github.com/ML4BM-Lab/JIND-Multi/blob/master/JIND.png" width="700">
+  <a href="https://www.python.org/downloads/release/python-368/">
+    <img src="https://img.shields.io/badge/Python-3.6%2B-blue.svg" alt="Python Version">
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-lightgrey.svg" alt="Platform">
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/GPU-Supported-brightgreen.svg" alt="GPU Support">
+  </a>
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
+  </a>
+</p>
+
+**JIND-Multi** is an advanced extension of the JIND framework, designed to automate the annotation of single-cell RNA sequencing (scRNA-Seq). This framework, originally introduced by [Goyal et al., 2022](https://academic.oup.com/bioinformatics/article/38/9/2488/6543609), now supports the transfer of cell-type labels from multiple annotated datasets, enhancing the accuracy and reliability of annotations. Additionally, **JIND-Multi** is applicable for annotating scATAC-Seq data and can flag cells as "unassigned" if predictions fall below predefined thresholds.
+
+Leveraging multiple annotated datasets, such as those in an atlas, **JIND-Multi** improves the precision of unlabeled dataset annotations while reducing rejection rates (unassigned cells). We offer a robust and efficient implementation of **JIND-Multi**, available for the scientific community.
+
+<p align="center">
+    <img src="https://github.com/ML4BM-Lab/JIND-Multi/blob/master/JIND.png" alt="JIND-Multi Logo" width="700">
 </p>
 
 ## Prerequisites
-- Linux or macOS
-- Miniconda
-- Python 3.6 or higher (tested on 3.6.8 and 3.7.11)
-- CPU or NVIDIA GPU + CUDA CuDNN
+
+- **Operating System:** Linux or macOS
+- **Environment Manager:** Miniconda
+- **Programming Language:** Python 3.6 or higher (tested on 3.6.8 and 3.7.11)
+- **Hardware:** CPU or NVIDIA GPU + CUDA CuDNN
 
 ## Installation
+To install **JIND-Multi**, follow these steps:
+
 ```bash
 git clone https://github.com/ML4BM-Lab/JIND-Multi.git
 cd JIND-Multi
