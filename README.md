@@ -42,6 +42,12 @@ conda activate jind
 pip install -e .
 ```
 
+## Use with Docker
+cd <PATH>
+git clone https://github.com/ML4BM-Lab/JIND-Multi.git
+docker pull xgarrotesan/jind_multi
+docker run -it -v <PATH>:/app xgarrotesan/jind_multi
+
 ## Data
 The datasets to reproduce the results presented in the manuscript are available at the following link:  https://doi.org/10.5281/zenodo.11098805
 
