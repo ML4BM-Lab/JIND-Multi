@@ -1,0 +1,13 @@
+{
+    "PATH": "/path/to/data/All_human_brain.h5ad",
+    "BATCH_COL": "batch",
+    "LABELS_COL": "label",
+    "SOURCE_DATASET_NAME": "C4",
+    "TARGET_DATASET_NAME": "C7",
+    "OUTPUT_PATH": "/path/to/save/results",
+    "PRETRAINED_MODEL_PATH": "/path/to/pretrained_model_folder",
+    "TRAIN_DATASETS_NAMES": "['AD2', 'ADx1']",
+    "NUM_FEATURES": 5000,
+    "MIN_CELL_TYPE_POPULATION": 100,
+    "USE_GPU": true
+}

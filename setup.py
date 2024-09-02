@@ -41,30 +41,3 @@ setup(
     },
     zip_safe=False
 )
-
-# run-main --PATH path/to/data --BATCH_COL batch_column_name --LABELS_COL labels_column_name --SOURCE_DATASET_NAME source_name --TARGET_DATASET_NAME target_name --OUTPUT_PATH output_path --NUM_FEATURES 5000 --MIN_CELL_TYPE_POPULATION 100 --N_TRIAL 1 --USE_GPU True
-# compare-methods --PATH path/to/data --BATCH_COL batch_column_name --LABELS_COL labels_column_name --SOURCE_DATASET_NAME source_name --TARGET_DATASET_NAME target_name --OUTPUT_PATH output_path --NUM_FEATURES 5000 --MIN_CELL_TYPE_POPULATION 100 --N_TRIAL 1 --USE_GPU True
-
-# jind_multi.main:main indica que el comando jind-multi ejecutará la función main del módulo main en el paquete jind_multi.
-
-# Ejemplo de Uso
-# Supongamos que tienes una función main en tu módulo jind_multi/main.py que es el punto de entrada principal de tu aplicación. Con la configuración de setup.py proporcionada:
-
-# Instalas el paquete localmente:
-
-# bash
-# Copiar código
-# pip install .
-# Ejecutas el comando jind-multi desde la terminal:
-
-# bash
-# Copiar código
-# jind-multi --arg1 value1 --arg2 value2
-# Esto invocará la función main en jind_multi/main.py y pasará los argumentos de la línea de comandos a esa función.
-
-# Ventajas de Usar Entry Points
-# Facilidad de Uso: Permite que tu aplicación sea ejecutada fácilmente desde la línea de comandos sin tener que invocar directamente el script Python.
-
-# Interoperabilidad: Puedes definir múltiples entry points para diferentes funcionalidades dentro de tu paquete.
-
-# Despliegue Simplificado: Los usuarios pueden instalar tu paquete y ejecutar comandos específicos sin preocuparse por la estructura interna del código.

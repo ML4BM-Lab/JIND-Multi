@@ -54,21 +54,22 @@ There are two options to execute the JIND-Multi framework:
 * Running with Docker
 
 ### Option 1: The Python Script 
-For executing JIND-Multi on the `Brain Neurips` dataset, we would do it as follows: 
+For executing JIND-Multi on the `Brain Neurips` dataset, you can use a `.json` configuration file. The content of the file should be as follows:
 
-```bash
-run-jind-multi --PATH /path/to/data/All_human_brain.h5ad \
-               --BATCH_COL "batch" \
-               --LABELS_COL "label" \
-               --SOURCE_DATASET_NAME "C4" \
-               --TARGET_DATASET_NAME "C7" \
-               --OUTPUT_PATH /path/to/save/results \
-               --TRAIN_DATASETS_NAMES "['AD2', 'ADx1']" \
-               --NUM_FEATURES 5000 \
-               --MIN_CELL_TYPE_POPULATION 100 \
-               --PRETRAINED_MODEL_PATH /path/to/pretrained_model_folder \
-               --USE_GPU True
-```
+{
+    "PATH": "/path/to/data/All_human_brain.h5ad",
+    "BATCH_COL": "batch",
+    "LABELS_COL": "label",
+    "SOURCE_DATASET_NAME": "C4",
+    "TARGET_DATASET_NAME": "C7",
+    "OUTPUT_PATH": "/path/to/save/results",
+    "PRETRAINED_MODEL_PATH": "/path/to/pretrained_model_folder",
+    "TRAIN_DATASETS_NAMES": "['AD2', 'ADx1']",
+    "NUM_FEATURES": 5000,
+    "MIN_CELL_TYPE_POPULATION": 100,
+    "USE_GPU": true
+}
+
 where,
 - **`PATH`**: (string) Path to the file with the data in a `.h5ad` format.
 - **`BATCH_COL`**: (string) Column name with the information of the different batches or donors in your AnnData object.
@@ -82,6 +83,30 @@ where,
 - **`MIN_CELL_TYPE_POPULATION`**: (int) Optional. For each batch, the minimum necessary number of cells per cell type to train. If this requirement is not met in any batch, the cells belonging to this cell type are discarded from all batches, the default is 100 cells.
 - **`USE_GPU`**: (bool) Optional but recommended. Whether to use the GPU to train, default is True.
 
+**Note:** The `PRETRAINED_MODEL_PATH` argument is optional and should be provided only if you want to use a pre-trained model. If you do not specify this argument, JIND-Multi will train a new model from scratch based on the provided data.
+
+To execute JIND-Multi using the configuration file:
+
+```bash
+run-jind-multi --config /path/to/config.json
+```
+
+Alternatively, you can run JIND-Multi directly from the command line by providing all the necessary parameters:
+
+```bash
+run-jind-multi --PATH "/path/to/data/All_human_brain.h5ad" \
+               --BATCH_COL "batch" \
+               --LABELS_COL "label" \
+               --SOURCE_DATASET_NAME "C4" \
+               --TARGET_DATASET_NAME "C7" \
+               --OUTPUT_PATH "/path/to/save/results" \
+               --TRAIN_DATASETS_NAMES "['AD2', 'ADx1']" \
+               --NUM_FEATURES 5000 \
+               --MIN_CELL_TYPE_POPULATION 100 \
+               --PRETRAINED_MODEL_PATH "/path/to/pretrained_model_folder" \
+               --USE_GPU True
+```
+
 ### Option 2: Submit a Job in a HPC
 If the number of training datasets or the total number of cells is high, we recommend submitting the job using the provided `main.sh` script from the cluster directory. 
 This script is adapted to Slurm, but can be easily modified to work on SGE. 
@@ -91,6 +116,22 @@ The specific parameters should be adapted depending on the specifications of the
 cd cluster
 sbatch main.sh
 ```
+### Option 3: Running with Docker
+To run JIND-Multi using Docker, follow these steps:
+
+1. Pull the Docker image:
+
+    ```bash
+    docker pull xgarrotesan/jind_multi
+    ```
+
+2. Run the Docker container, replacing `<PATH>` with the appropriate path on your system:
+
+    ```bash
+    docker run -it -v <PATH>:/app xgarrotesan/jind_multi
+    ```
+
+Replace <PATH> with the appropriate path on your system.
 
 ### Output
 In the `OUTPUT_PATH`, the following outputs are saved:
@@ -107,14 +148,6 @@ For the source batch, confusion matrices are shown after training the classifier
 2) After removing the batch effect from each intermediate batch and before inferring on the target batch ("initial").
 3) After aligning the target batch to the latent code of the source with the GAN training.
 4) After tuning the encoder and classifier for the target batch.
-
-### Option 3: Running with Docker
-```bash
-cd <PATH>
-git clone https://github.com/ML4BM-Lab/JIND-Multi.git
-docker pull xgarrotesan/jind_multi
-docker run -it -v <PATH>:/app xgarrotesan/jind_multi
-```
 
 ## Notebooks
 In the `notebooks` folder, there is an example of executing JIND-Multi, explaining in detail the data processing and the internal functioning of the method.
