@@ -27,7 +27,7 @@ Leveraging multiple annotated datasets, such as those in an atlas, **JIND-Multi*
 ## Prerequisites
 
 - **Operating System:** Linux or macOS
-- **Environment Manager:** Miniconda
+- **Environment Manager:** [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 - **Programming Language:** Python 3.6 or higher (tested on 3.6.8 and 3.7.11)
 - **Hardware:** CPU or NVIDIA GPU + CUDA CuDNN
 
@@ -42,22 +42,19 @@ conda activate jind
 pip install -e .
 ```
 
-## Use with Docker
-cd <PATH>
-git clone https://github.com/ML4BM-Lab/JIND-Multi.git
-docker pull xgarrotesan/jind_multi
-docker run -it -v <PATH>:/app xgarrotesan/jind_multi
-
 ## Data
-The datasets to reproduce the results presented in the manuscript are available at the following link:  https://doi.org/10.5281/zenodo.11098805
+The datasets used to reproduce the results presented in the manuscript are available at the following link: https://doi.org/10.5281/zenodo.11098805.
+
+Please note that if you are using any of the datasets published on Zenodo, refer to the table [`Input Arguments Information`](#input-arguments-information) at the end of this README to correctly add the input arguments.
 
 # Executing JIND-Multi
 There are two options to execute the JIND-Multi framework: 
 * Running the Python script 
 * Submitting a job to a HPC queue
+* Running with Docker
 
 ### Option 1: The Python Script 
-For executing JIND-Multi on the `Brain Neurips` dataset, we would do it as follows:
+For executing JIND-Multi on the `Brain Neurips` dataset, we would do it as follows: 
 
 ```bash
 run-jind-multi --PATH /path/to/data/All_human_brain.h5ad \
@@ -110,6 +107,14 @@ For the source batch, confusion matrices are shown after training the classifier
 2) After removing the batch effect from each intermediate batch and before inferring on the target batch ("initial").
 3) After aligning the target batch to the latent code of the source with the GAN training.
 4) After tuning the encoder and classifier for the target batch.
+
+### Option 3: Running with Docker
+```bash
+cd <PATH>
+git clone https://github.com/ML4BM-Lab/JIND-Multi.git
+docker pull xgarrotesan/jind_multi
+docker run -it -v <PATH>:/app xgarrotesan/jind_multi
+```
 
 ## Notebooks
 In the `notebooks` folder, there is an example of executing JIND-Multi, explaining in detail the data processing and the internal functioning of the method.
