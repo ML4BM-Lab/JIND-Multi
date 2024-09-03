@@ -56,6 +56,7 @@ There are two options to execute the JIND-Multi framework:
 ### Option 1: The Python Script 
 For executing JIND-Multi on the `Brain Neurips` dataset, you can use a `.json` configuration file. The content of the file should be as follows:
 
+```json
 {
     "PATH": "/path/to/data/All_human_brain.h5ad",
     "BATCH_COL": "batch",
@@ -69,6 +70,7 @@ For executing JIND-Multi on the `Brain Neurips` dataset, you can use a `.json` c
     "MIN_CELL_TYPE_POPULATION": 100,
     "USE_GPU": true
 }
+```
 
 where,
 - **`PATH`**: (string) Path to the file with the data in a `.h5ad` format.
