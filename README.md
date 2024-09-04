@@ -119,25 +119,32 @@ cd cluster
 sbatch main.sh
 ```
 ### Option 3: Running with Docker
-To run JIND-Multi using Docker, follow these steps:
-You must run this commands with administration rights
+You can run JIND-Multi using Docker with the following steps. **You must run these commands with administrator rights**.
 
-1. Pull the Docker image:
+#### Option 3.1: Using a pre-built Docker image
+
+1. Pull the pre-built Docker image:
 
     ```bash
     docker pull xgarrotesan/jind_multi
     ```
 
-2. Run the Docker container, replacing `<PATH>` with the appropriate path on your system:
+2. Run the Docker container, replacing `<PATH>` with the absolute path to the folder on your system that contains the JIND-Multi repository and the `.h5ad` data files:
 
     ```bash
     docker run -it -v <PATH>:/app xgarrotesan/jind_multi
+    ```
+
+   **Important**: The `<PATH>` you map to the container must contain both:
+   - The **JIND-Multi repository** (the project files) 
+   - The **`.h5ad` data files** you want to process.
+
+3. Activate the Conda environment inside the container:
+    ```bash
     conda activate jind
     ```
 
-Replace <PATH> with the appropriate path on your system.
-
-3. Run JIND-Multi as usual, defining the path by mapping the unit to `app`, which is the container's folder:
+4. Run JIND-Multi as usual, defining the path by mapping the unit to `app`, which is the container's folder:
 
     ```json
     {
@@ -154,11 +161,33 @@ Replace <PATH> with the appropriate path on your system.
     }
     ```
 
-4. Finally, run the following command to start JIND-Multi:
+5. Finally, start JIND-Multi using the following command:
 
     ```bash
     run-jind-multi --config "/app/config.json"
     ```
+
+#### Option 3.2: Building the Docker image locally
+
+If you prefer to build the Docker image locally using the provided Dockerfile:
+
+<!-- 1. Clone the repository if you haven't already:
+  ```bash
+  git clone https://github.com/ML4BM-Lab/JIND-Multi.git
+  cd JIND-Multi -->
+  
+1. Build the Docker image locally:
+  ```bash
+    docker build -t jind_multi_local .  
+  ```
+
+2. Run the Docker container, ensuring that you map the local path to the folder containing both the repository and .h5ad files. Replace <PATH> with the absolute path to your system's directory:
+
+  ```bash
+    docker run -it -v <PATH>:/app jind_multi_local
+  ```
+
+Then, repeat steps 3., 4. & 5.
 
 ### Output
 In the `OUTPUT_PATH`, the following outputs are saved:

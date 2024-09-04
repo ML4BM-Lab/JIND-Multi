@@ -4,3 +4,8 @@
 *.txt
 *.egg-info
 *.h5ad
+config_try.json
+.gitignore
+.DS_Store
+resources/
+resources.zip
