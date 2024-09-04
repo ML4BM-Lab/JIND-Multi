@@ -132,7 +132,6 @@ To run JIND-Multi using Docker, follow these steps:
     ```bash
     docker run -it -v <PATH>:/app xgarrotesan/jind_multi
     conda activate jind
-    pip install -e .
     ```
 
 Replace <PATH> with the appropriate path on your system.
