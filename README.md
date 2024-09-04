@@ -120,6 +120,7 @@ sbatch main.sh
 ```
 ### Option 3: Running with Docker
 To run JIND-Multi using Docker, follow these steps:
+You must run this commands with administration rights
 
 1. Pull the Docker image:
 
