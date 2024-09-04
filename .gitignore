@@ -1,0 +1,6 @@
+/results
+/jind_multi/__pycache__
+/cluster/__pycache__
+*.txt
+*.egg-info
+*.h5ad
