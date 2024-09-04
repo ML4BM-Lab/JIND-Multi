@@ -131,9 +131,34 @@ To run JIND-Multi using Docker, follow these steps:
 
     ```bash
     docker run -it -v <PATH>:/app xgarrotesan/jind_multi
+    conda activate jind
+    pip install -e .
     ```
 
 Replace <PATH> with the appropriate path on your system.
+
+3. Run JIND-Multi as usual, defining the path by mapping the unit to `app`, which is the container's folder:
+
+    ```json
+    {
+        "PATH": "/app/pancreas.h5ad",
+        "BATCH_COL": "batch",
+        "LABELS_COL": "celltype",
+        "SOURCE_DATASET_NAME": "0",
+        "TARGET_DATASET_NAME": "3",
+        "OUTPUT_PATH": "/app/results",
+        "TRAIN_DATASETS_NAMES": "['0', '1', '2']", 
+        "NUM_FEATURES": 5000,
+        "MIN_CELL_TYPE_POPULATION": 5,
+        "USE_GPU": true
+    }
+    ```
+
+4. Finally, run the following command to start JIND-Multi:
+
+    ```bash
+    run-jind-multi --config "/app/config.json"
+    ```
 
 ### Output
 In the `OUTPUT_PATH`, the following outputs are saved:
