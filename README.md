@@ -28,7 +28,7 @@ Leveraging multiple annotated datasets, such as those in an atlas, **JIND-Multi*
 
 - **Operating System:** Linux or macOS
 - **Environment Manager:** [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-- **Programming Language:** Python 3.6 or higher (tested on 3.6.8 and 3.7.11)
+- **Programming Language:** Python 3.7 or higher
 - **Hardware:** CPU or NVIDIA GPU + CUDA CuDNN
 
 ## Installation
