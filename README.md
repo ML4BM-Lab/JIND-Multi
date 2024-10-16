@@ -24,7 +24,7 @@ Leveraging multiple annotated datasets, such as those in an atlas, **JIND-Multi*
     <img src="https://github.com/ML4BM-Lab/JIND-Multi/blob/master/JIND.png" alt="JIND-Multi Logo" width="700">
 </p>
 
-## Prerequisites
+## Prerequisites without Docker
 
 - **Operating System:** Linux or macOS
 - **Environment Manager:** [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
