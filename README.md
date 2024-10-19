@@ -53,7 +53,7 @@ There are two options to execute the JIND-Multi framework:
 * Submitting a job to a HPC queue
 * Running with Docker
 
-### Option 1: The Python Script 
+### Option 1: Running the Python Script 
 For executing JIND-Multi on the `Brain Neurips` dataset, you can use a `.json` configuration file. The content of the file should be as follows:
 
 ```json
