@@ -13,6 +13,7 @@ def load_and_process_data(args, config={}):
     config = get_config(config)['data']
     try:
         adata = sc.read(args.PATH)
+        adata.var_names_make_unique()
     except OSError as e:
         # Add a warning and raise an error for the specific issue
         warnings.warn(f"Failed to read the H5AD file at {args.PATH}. The file may be corrupted or incomplete.")
@@ -74,7 +75,6 @@ def preprocess_data(data, config):
     data = filter_cells(data, min_cell_type_population=config['min_cell_type_population'], max_cells_for_dataset=config['max_cells_for_dataset'])
     data = data.reindex(sorted(data.columns), axis=1)  # Reorder columns
     return data
-
 
 # 4) Plot umap before batch effect reduction
 #sc.pl.scatter(adata, basis='umap', color=[labels_col, batch_col], frameon=False, show=False)

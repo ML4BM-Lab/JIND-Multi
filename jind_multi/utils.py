@@ -132,7 +132,6 @@ def preprocess(data, count_normalize=True, log_transformation=True, target_sum=1
     batches = data['batch']
     labels = data['labels']
     raw_features = data.drop(['batch', 'labels'], axis=1).values
-
     error = np.mean(np.abs(raw_features - np.rint(raw_features)))
     if error != 0:
         return data
@@ -142,27 +141,22 @@ def preprocess(data, count_normalize=True, log_transformation=True, target_sum=1
     if log_transformation:
         print('[Utils] Applying log transformation ...')
         raw_features = np.log(1 + raw_features)
-
     # data = pd.DataFrame(raw_features, index=data.index, columns=list(set(data.columns) - {'batch', 'labels'}))
     data = pd.DataFrame(raw_features, index=data.index, columns=data.drop(['batch', 'labels'], axis=1).columns)
-
     data['batch'] = batches
     data['labels'] = labels
     return data
-
 
 def dimension_reduction(data, num_features=5000):
     print('[Utils] Variance based dimension reduction ...')
     batches = data['batch']
     labels = data['labels']
     data = data.drop(['batch', 'labels'], axis=1)
-
     features = data.columns[np.argsort(-np.var(data.values, axis=0))[:num_features]]
     data = data[features]
     data['batch'] = batches
     data['labels'] = labels
     return data
-
 
 def filter_cells(data, min_cell_type_population=100, max_cells_for_dataset=50000):
     # min_cell_type_population and max_cells_for_dataset filter (if one batch has one cell_type with a too low population these samples will be removed too from the other batches)
@@ -172,7 +166,6 @@ def filter_cells(data, min_cell_type_population=100, max_cells_for_dataset=50000
     for batch in [n for n in set(data['batch']) if n != data['batch'][0]]:
         batch_data = data[data['batch'] == batch]
         data_trimmed = data_trimmed.append(batch_data[:max_cells_for_dataset])
-
     data = data_trimmed
     cell_types_with_low_population = []
     for batch in set(data['batch']):
@@ -182,7 +175,6 @@ def filter_cells(data, min_cell_type_population=100, max_cells_for_dataset=50000
                 cell_types_with_low_population = cell_types_with_low_population + [cell_type_names[i]]
                 print("[Utils][filter_cells] Batch '{}': {} only has {} cells (min cell type population = {})".format(
                     batch, cell_type_names[i], cell_type_counts[i], min_cell_type_population))
-
     cell_types_to_retain = set(data['labels']) - set(cell_types_with_low_population)
     data = data[data['labels'].isin(cell_types_to_retain)]
     print("[Utils][filter_cells] Cell type population count in data: ", *np.unique(data['labels'], return_counts=True))
