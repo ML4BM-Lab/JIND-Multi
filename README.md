@@ -24,11 +24,11 @@ Leveraging multiple annotated datasets, such as those in an atlas, **JIND-Multi*
     <img src="https://github.com/ML4BM-Lab/JIND-Multi/blob/master/JIND.png" alt="JIND-Multi Logo" width="700">
 </p>
 
-## Prerequisites
+## Prerequisites without Docker
 
 - **Operating System:** Linux or macOS
 - **Environment Manager:** [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-- **Programming Language:** Python 3.6 or higher (tested on 3.6.8 and 3.7.11)
+- **Programming Language:** Python 3.6.8 or higher
 - **Hardware:** CPU or NVIDIA GPU + CUDA CuDNN
 
 ## Installation
@@ -53,9 +53,10 @@ There are two options to execute the JIND-Multi framework:
 * Submitting a job to a HPC queue
 * Running with Docker
 
-### Option 1: The Python Script 
+### Option 1: Running the Python Script 
 For executing JIND-Multi on the `Brain Neurips` dataset, you can use a `.json` configuration file. The content of the file should be as follows:
 
+```json
 {
     "PATH": "/path/to/data/All_human_brain.h5ad",
     "BATCH_COL": "batch",
@@ -69,6 +70,7 @@ For executing JIND-Multi on the `Brain Neurips` dataset, you can use a `.json` c
     "MIN_CELL_TYPE_POPULATION": 100,
     "USE_GPU": true
 }
+```
 
 where,
 - **`PATH`**: (string) Path to the file with the data in a `.h5ad` format.
@@ -117,21 +119,75 @@ cd cluster
 sbatch main.sh
 ```
 ### Option 3: Running with Docker
-To run JIND-Multi using Docker, follow these steps:
+You can run JIND-Multi using Docker with the following steps. **You must run these commands with administrator rights**.
 
-1. Pull the Docker image:
+#### Option 3.1: Using a pre-built Docker image
+
+1. Pull the pre-built Docker image:
 
     ```bash
     docker pull xgarrotesan/jind_multi
     ```
 
-2. Run the Docker container, replacing `<PATH>` with the appropriate path on your system:
+2. Run the Docker container, replacing `<PATH>` with the absolute path to the folder on your system that contains the JIND-Multi repository and the `.h5ad` data files:
 
     ```bash
     docker run -it -v <PATH>:/app xgarrotesan/jind_multi
     ```
 
-Replace <PATH> with the appropriate path on your system.
+   **Important**: The `<PATH>` you map to the container must contain both:
+   - The **JIND-Multi repository** (the project files) 
+   - The **`.h5ad` data files** you want to process.
+
+3. Activate the Conda environment inside the container:
+    ```bash
+    conda activate jind
+    ```
+
+4. Run JIND-Multi as usual, defining the path by mapping the unit to `app`, which is the container's folder:
+
+    ```json
+    {
+        "PATH": "/app/pancreas.h5ad",
+        "BATCH_COL": "batch",
+        "LABELS_COL": "celltype",
+        "SOURCE_DATASET_NAME": "0",
+        "TARGET_DATASET_NAME": "3",
+        "OUTPUT_PATH": "/app/results",
+        "TRAIN_DATASETS_NAMES": "['0', '1', '2']", 
+        "NUM_FEATURES": 5000,
+        "MIN_CELL_TYPE_POPULATION": 5,
+        "USE_GPU": true
+    }
+    ```
+
+5. Finally, start JIND-Multi using the following command:
+
+    ```bash
+    run-jind-multi --config "/app/config.json"
+    ```
+
+#### Option 3.2: Building the Docker image locally
+
+If you prefer to build the Docker image locally using the provided Dockerfile:
+
+<!-- 1. Clone the repository if you haven't already:
+  ```bash
+  git clone https://github.com/ML4BM-Lab/JIND-Multi.git
+  cd JIND-Multi -->
+  
+1. Build the Docker image locally:
+  ```bash
+    docker build -t jind_multi_local .  
+  ```
+
+2. Run the Docker container, ensuring that you map the local path to the folder containing both the repository and .h5ad files. Replace <PATH> with the absolute path to your system's directory:
+
+  ```bash
+    docker run -it -v <PATH>:/app jind_multi_local
+  ```
+
+Then, repeat steps 3., 4. & 5.
 
 ### Output
 In the `OUTPUT_PATH`, the following outputs are saved:
@@ -189,16 +245,14 @@ where,
 
 ## Input Arguments Information
 
-| Dataset        | Type       | File                                      | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | TRAIN_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
-|----------------|------------|-------------------------------------------|----------------|---------------------------|---------------------|---------------------|-------------------------------------------------------------------------------------|--------------------------|
-| Pancreas       | scRNA-seq   | "pancreas.h5ad"                           | "batch"        | "celltype"                 | "0"                 | "3"                 | "['0', '1', '2']"                                                                    | 5                        |
-| NSCLC Lung     | scRNA-seq   | "NSCLC_lung_NORMALIZED_FILTERED.h5ad"     | "Donor"        | "predicted_labels_majority"| "Donor 5"           | "Donor 2"           | "['Donor 0', 'Donor 1', 'Donor 3', 'Donor 4', 'Donor 6']"                            | 20                       |
-| Neurips Brain  | scRNA-seq   | "All_human_brain.h5ad"                    | "batch"        | "label"                    | "C4"                | "C7"                | "['AD2', 'ADx1', 'ADx2', 'ADx4']"                                                    | 100                      |
-| BMMC           | scATAC-seq  | "data_multiome_annotated_BMMC_ATAC.h5ad"  | "batch"        | "cell_type"                | "s4d8"              | "s3d3"              | "['s1d1', 's1d2', 's1d3', 's2d1', 's2d4', 's2d5', 's3d10', 's4d1']"                 | 18                       |
-
+| Dataset        | Type       | File                                        | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | TRAIN_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
+|----------------|------------|---------------------------------------------|----------------|---------------------------|---------------------|---------------------|-------------------------------------------------------------------------------------|--------------------------|
+| Pancreas       | scRNA-seq  | "pancreas.h5ad"                             | "batch"        | "celltype"                | "0"                 | "3"                 | "['0', '1', '2']"                                                                    | 5                        |
+| NSCLC Lung     | scRNA-seq  | "NSCLC_lung_NORMALIZED_FILTERED.h5ad"      | "Donor"        | "predicted_labels_majority"| "Donor5"           | "Donor2"           | "['Donor0', 'Donor1', 'Donor3', 'Donor4', 'Donor6']"                            | 20                       |
+| Neurips Brain  | scRNA-seq  | "All_human_brain.h5ad"                      | "batch"        | "label"                    | "C4"                | "C7"                | "['AD2', 'ADx1', 'ADx2', 'ADx4']"                                                    | 100                      |
+| BMMC           | scATAC-seq | "data_multiome_annotated_BMMC_ATAC.h5ad"   | "batch"        | "cell_type"                | "s4d8"              | "s3d3"              | "['s1d1', 's1d2', 's1d3', 's2d1', 's2d4', 's2d5', 's3d10', 's4d1']"                 | 18                       |
+| Fetal Heart    | scATAC-seq | "heart_sample_norm_scaled_data_annotated.h5ad"| "batch"      | "celltype"                | "heart_sample_39"      | "heart_sample_14"       | "['heart_sample_32']"                                   | 100                       |
+| Fetal Kidney   | scATAC-seq | "kidney_sample_norm_scaled_data_annotated.h5ad"| "batch"     | "celltype"                | "kidney_sample_3"     | "kidney_sample_67"       | "['kidney_sample_34', 'kidney_sample_65']"                                   | 100                      |
 
 # Additional Information
 In the ./jind_multi folder, you will find an extra README that provides a detailed explanation of each of the Python scripts in the `jind_multi` package.
-
-
-
