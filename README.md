@@ -175,6 +175,11 @@ If you prefer to build the Docker image locally using the provided Dockerfile:
   ```bash
   git clone https://github.com/ML4BM-Lab/JIND-Multi.git
   cd JIND-Multi -->
+
+0. Go to repository folder 
+  ```bash
+    cd /path/to/JIND-Multi/  
+  ```
   
 1. Build the Docker image locally:
   ```bash
