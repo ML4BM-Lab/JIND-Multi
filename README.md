@@ -43,7 +43,7 @@ pip install -e .
 ```
 
 ## Data
-The datasets used to reproduce the results presented in the manuscript are available at the following link: https://doi.org/10.5281/zenodo.11098805.
+The datasets used to reproduce the results presented in the manuscript are available at the following link: https://doi.org/10.5281/zenodo.14000644.
 
 Please note that if you are using any of the datasets published on Zenodo, refer to the table [`Input Arguments Information`](#input-arguments-information) at the end of this README to correctly add the input arguments.
 
@@ -176,10 +176,12 @@ If you prefer to build the Docker image locally using the provided Dockerfile:
   git clone https://github.com/ML4BM-Lab/JIND-Multi.git
   cd JIND-Multi -->
 
-0. Go to repository folder 
+0. Go to repository folder absolute path in our case <PATH>
   ```bash
-    cd /path/to/jind-Multi_local/  
+    cd <PATH>  
   ```
+
+  **Very important first build docker image and then put h5ad files in repository path in our case <PATH>**
   
 1. Build the Docker image locally:
   ```bash
@@ -258,6 +260,8 @@ compare-methods --config /path/to/config.json
 ```
 
 ## Input Arguments Information
+
+**To execute All_human_brain.h5ad and data_multiome_annotated_BMMC_ATAC.h5ad you have to use a HPCSystem as it requires more resources than local OS**
 
 | Dataset        | Type       | File                                        | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | TRAIN_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
 |----------------|------------|---------------------------------------------|----------------|---------------------------|---------------------|---------------------|-------------------------------------------------------------------------------------|--------------------------|
