@@ -261,7 +261,7 @@ compare-methods --config /path/to/config.json
 
 ## Input Arguments Information
 
-**To execute All_human_brain.h5ad and data_multiome_annotated_BMMC_ATAC.h5ad you have to use a HPCSystem as it requires more resources than local OS**
+**To execute All_human_brain.h5ad and data_multiome_annotated_BMMC_ATAC.h5ad you have to use a HPCSystem as it requires more resources than local OS.**
 
 | Dataset        | Type       | File                                        | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | TRAIN_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
 |----------------|------------|---------------------------------------------|----------------|---------------------------|---------------------|---------------------|-------------------------------------------------------------------------------------|--------------------------|
