@@ -1,8 +1,8 @@
 import argparse
 import ast
-import json
 from jind_multi.core import run_main
 from jind_multi.config_loader import get_config
+from jind_multi.utils import load_config_from_file
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Main script to execute JindMulti and annotate a target batch using several annotated batches')
@@ -19,10 +19,6 @@ def parse_args():
     parser.add_argument('--MIN_CELL_TYPE_POPULATION', type=int, default=100, help='Optional. For each batch, the minimum number of cells per cell type necessary for modeling. If this requirement is not met in any batch, the samples belonging to this cell type are removed from all batches')
     parser.add_argument('--USE_GPU', type=ast.literal_eval, default=True, help='Optional. Use CUDA if available (True/False), default is True')
     return parser.parse_args()
-
-def load_config_from_file(file_path):
-    with open(file_path, 'r') as f:
-        return json.load(f)
 
 def main():
     args = parse_args()

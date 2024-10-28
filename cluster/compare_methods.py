@@ -10,6 +10,7 @@ import ast
 from jind_multi.jind_wrapper import run_single_mode, run_multi_mode, run_combined_mode
 from jind_multi.data_loader import load_and_process_data
 from jind_multi.config_loader import get_config
+from jind_multi.utils import load_config_from_file
 
 def remove_pth_files(folder_path):
     for root, _, files in os.walk(folder_path):
@@ -135,20 +136,29 @@ def run_comparison(args, data, trial):
   
 def parse_args():    
     parser = argparse.ArgumentParser(description='Compare JIND Methods')
-    parser.add_argument('--PATH', type=str, required=True, help='Path to the ann object dataset file with gene expression data of shape cells_id x genes')
-    parser.add_argument('--BATCH_COL', type=str, required=True, help='Name of the batch column')
-    parser.add_argument('--LABELS_COL', type=str, required=True, help='Name of the labels column')
-    parser.add_argument('--SOURCE_DATASET_NAME', type=str, help='Name or ID of source dataset') 
-    parser.add_argument('--TARGET_DATASET_NAME', type=str, required=True, help='Name or ID of target dataset') 
-    parser.add_argument('--OUTPUT_PATH', type=str, required=True, help='Output path to save results and trained model')
+    parser.add_argument('--config', type=str, help='Path to JSON config file')
+    parser.add_argument('--PATH', type=str, help='Path to the ann object dataset file with gene expression data of shape cells_id x genes')
+    parser.add_argument('--BATCH_COL', type=str, help='Name of the batch column')
+    parser.add_argument('--LABELS_COL', type=str, help='Name of the labels column')
+    parser.add_argument('--SOURCE_DATASET_NAME', type=str, default=None, help='Name or ID of source dataset') 
+    parser.add_argument('--TARGET_DATASET_NAME', type=str, help='Name or ID of target dataset') 
+    parser.add_argument('--OUTPUT_PATH', type=str, help='Output path to save results and trained model')
     parser.add_argument('--NUM_FEATURES', type=int, default=5000, help='Optional. Number of genes to consider for modeling, default is 5000')
     parser.add_argument('--MIN_CELL_TYPE_POPULATION', type=int, default=100, help='Optional. For each batch, the minimum number of cells per cell type necessary for modeling. If this requirement is not met in any batch, the samples belonging to this cell type are removed from all batches')
-    parser.add_argument('--N_TRIAL', type=int, required=True, help='Number of the trial experiment')
+    parser.add_argument('--N_TRIAL', type=int, default=0, help='Number of the trial experiment')
     parser.add_argument('--USE_GPU', type=ast.literal_eval, default=True, help='Optional. Use CUDA if available (True/False), default is True')
     return parser.parse_args()
 
 def main():
     args = parse_args()
+
+    if args.config:
+        config_data = load_config_from_file(args.config)
+        # Override arguments with values from config file if they are not None
+        for key, value in config_data.items():
+            if value is not None:
+                setattr(args, key, value)
+
     config = get_config()
     config['data']['num_features'] = args.NUM_FEATURES
     config['data']['min_cell_type_population'] = args.MIN_CELL_TYPE_POPULATION
@@ -166,3 +176,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

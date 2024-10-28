@@ -14,6 +14,10 @@ import json
 import torch
 from .config_loader import get_config
 
+def load_config_from_file(file_path):
+    with open(file_path, 'r') as f:
+        return json.load(f)
+
 def find_saved_models(path_saved_models, train_data):
     # List to store the paths of saved model files
     file_paths = []

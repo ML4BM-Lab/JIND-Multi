@@ -209,13 +209,16 @@ For the source batch, confusion matrices are shown after training the classifier
 In the `notebooks` folder, there is an example of executing JIND-Multi, explaining in detail the data processing and the internal functioning of the method.
 
 # Compare JIND Methods
-To compare the annotation performance of JIND, JIND-Multi, and JIND-Combined (which merges all annotated datasets into a single one without correcting for batch effects) on any target dataset with known true labels, you have two options:
+This guide explains how to evaluate and compare the annotation performance of JIND, JIND-Multi, and JIND-Combined (a method that merges all annotated datasets into one without batch effect correction) on any target dataset with known true labels.
 
+You have two options to run the comparison:
 * Run the Python script directly.
 * Submit a job to an HPC queue: you can execute the compare_methods.sh script.
 
-```bash
+## Example Command
+The following example demonstrates how to run the compare-methods script with command-line arguments:
 
+```bash
 DATA_PATH="/path/to/data/pancreas/pancreas.h5ad"
 BATCH_COL="batch"
 LABELS_COL="celltype"
@@ -242,6 +245,12 @@ compare-methods --PATH "$DATA_PATH" \
 ```
 where,
 - **`N_TRIAL`**: (int) A numeric identifier assigned to the experiment.
+
+Alternatively, you can also run `compare-methods` using a configuration file in JSON format:
+
+```bash
+compare-methods --config /path/to/config.json
+```
 
 ## Input Arguments Information
 
