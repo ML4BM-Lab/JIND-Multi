@@ -178,7 +178,7 @@ If you prefer to build the Docker image locally using the provided Dockerfile:
 
 0. Go to repository folder 
   ```bash
-    cd /path/to/JIND-Multi/  
+    cd /path/to/jind-Multi_local/  
   ```
   
 1. Build the Docker image locally:
