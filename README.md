@@ -48,7 +48,7 @@ The datasets used to reproduce the results presented in the manuscript are avail
 Please note that if you are using any of the datasets published on Zenodo, refer to the table [`Input Arguments Information`](#input-arguments-information) at the end of this README to correctly add the input arguments.
 
 # Executing JIND-Multi
-There are two options to execute the JIND-Multi framework: 
+There are three options to execute the JIND-Multi framework: 
 * Running the Python script 
 * Submitting a job to a HPC queue
 * Running with Docker
