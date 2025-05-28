@@ -154,7 +154,7 @@ You can run JIND-Multi using Docker with the following steps. **You must run the
         "SOURCE_DATASET_NAME": "0",
         "TARGET_DATASET_NAME": "3",
         "OUTPUT_PATH": "/app/results",
-        "TRAIN_DATASETS_NAMES": "['0', '1', '2']", 
+        "TRAIN_DATASETS_NAMES": "['1', '2']", 
         "NUM_FEATURES": 5000,
         "MIN_CELL_TYPE_POPULATION": 5,
         "USE_GPU": true
@@ -265,7 +265,7 @@ compare-methods --config /path/to/config.json
 
 | Dataset        | Type       | File                                        | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | TRAIN_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
 |----------------|------------|---------------------------------------------|----------------|---------------------------|---------------------|---------------------|-------------------------------------------------------------------------------------|--------------------------|
-| Pancreas       | scRNA-seq  | "pancreas.h5ad"                             | "batch"        | "celltype"                | "0"                 | "3"                 | "['0', '1', '2']"                                                                    | 5                        |
+| Pancreas       | scRNA-seq  | "pancreas.h5ad"                             | "batch"        | "celltype"                | "0"                 | "3"                 | "['1', '2']"                                                                    | 5                        |
 | NSCLC Lung     | scRNA-seq  | "NSCLC_lung_NORMALIZED_FILTERED.h5ad"      | "Donor"        | "predicted_labels_majority"| "Donor5"           | "Donor2"           | "['Donor0', 'Donor1', 'Donor3', 'Donor4', 'Donor6']"                            | 20                       |
 | Neurips Brain  | scRNA-seq  | "All_human_brain.h5ad"                      | "batch"        | "label"                    | "C4"                | "C7"                | "['AD2', 'ADx1', 'ADx2', 'ADx4']"                                                    | 100                      |
 | BMMC           | scATAC-seq | "data_multiome_annotated_BMMC_ATAC.h5ad"   | "batch"        | "cell_type"                | "s4d8"              | "s3d3"              | "['s1d1', 's1d2', 's1d3', 's2d1', 's2d4', 's2d5', 's3d10', 's4d1']"                 | 18                       |
