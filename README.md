@@ -48,7 +48,7 @@ The datasets used to reproduce the results presented in the manuscript are avail
 Please note that if you are using any of the datasets published on Zenodo, refer to the table [`Input Arguments Information`](#input-arguments-information) at the end of this README to correctly add the input arguments.
 
 # Executing JIND-Multi
-There are two options to execute the JIND-Multi framework: 
+There are three options to execute the JIND-Multi framework: 
 * Running the Python script 
 * Submitting a job to a HPC queue
 * Running with Docker
@@ -65,7 +65,8 @@ For executing JIND-Multi on the `Brain Neurips` dataset, you can use a `.json` c
     "TARGET_DATASET_NAME": "C7",
     "OUTPUT_PATH": "/path/to/save/results",
     "PRETRAINED_MODEL_PATH": "/path/to/pretrained_model_folder",
-    "TRAIN_DATASETS_NAMES": "['AD2', 'ADx1']",
+    "INTER_DATASETS_NAMES": "['ADx1']",
+    "EXCLUDE_DATASETS_NAMES": "['AD2']",
     "NUM_FEATURES": 5000,
     "MIN_CELL_TYPE_POPULATION": 100,
     "USE_GPU": true
@@ -80,7 +81,8 @@ where,
 - **`TARGET_DATASET_NAME`**: (string) Name of the target batch to which transfer the annotations from the rest of the datasets.
 - **`OUTPUT_PATH`**: (string) Path where the model performance results will be stored. 
 - **`PRETRAINED_MODEL_PATH`**: (string) Optional. This argument specifies the path to a folder containing pre-trained models. If this path is provided, JIND-Multi will use the models from this folder instead of training new ones to infer on the new target batch. The folder should contain model files `.pt` format and a `.json` file containing the predictions on the validation test set used to compute the thresholds. If this argument is not provided or left empty, the script will proceed to train a new model from scratch based on the provided data.
-- **`TRAIN_DATASETS_NAMES`**: (string) Optional. This setting allows to specify the order of intermediate datasets used for training. The source batch should not be included here. If no specific order is provided, the model will train on the intermediate datasets in the order they appear in the data.
+- **`INTER_DATASETS_NAMES`**: (string) Optional. A comma-separated list of dataset names. This setting allows to specify the order of intermediate datasets used for training.  The source batch should not be included here. If no specific order is provided, the model will train on the intermediate datasets in the order they appear in the data.
+- **`EXCLUDE_DATASETS_NAMES`**: (string) Optional. A comma-separated list of dataset names to exclude from training. Be careful not to include the same dataset names as in `SOURCE_DATASET_NAME`, `TARGET_DATASET_NAME`, or `INTER_DATASETS_NAMES`. This is typically a variable that you may not need. Only use it if you truly need to exclude specific batches from your analysis.
 - **`NUM_FEATURES`**: (int) Optional. Number of genes to consider for modeling, default is 5000.
 - **`MIN_CELL_TYPE_POPULATION`**: (int) Optional. For each batch, the minimum necessary number of cells per cell type to train. If this requirement is not met in any batch, the cells belonging to this cell type are discarded from all batches, the default is 100 cells.
 - **`USE_GPU`**: (bool) Optional but recommended. Whether to use the GPU to train, default is True.
@@ -102,7 +104,8 @@ run-jind-multi --PATH "/path/to/data/All_human_brain.h5ad" \
                --SOURCE_DATASET_NAME "C4" \
                --TARGET_DATASET_NAME "C7" \
                --OUTPUT_PATH "/path/to/save/results" \
-               --TRAIN_DATASETS_NAMES "['AD2', 'ADx1']" \
+               --INTER_DATASETS_NAMES "['ADx1']" \
+               --EXCLUDE_DATASETS_NAMES": "['AD2']" \
                --NUM_FEATURES 5000 \
                --MIN_CELL_TYPE_POPULATION 100 \
                --PRETRAINED_MODEL_PATH "/path/to/pretrained_model_folder" \
@@ -154,7 +157,7 @@ You can run JIND-Multi using Docker with the following steps. **You must run the
         "SOURCE_DATASET_NAME": "0",
         "TARGET_DATASET_NAME": "3",
         "OUTPUT_PATH": "/app/results",
-        "TRAIN_DATASETS_NAMES": "['0', '1', '2']", 
+        "INTER_DATASETS_NAMES": "['1', '2']", 
         "NUM_FEATURES": 5000,
         "MIN_CELL_TYPE_POPULATION": 5,
         "USE_GPU": true
@@ -263,9 +266,9 @@ compare-methods --config /path/to/config.json
 
 **To execute All_human_brain.h5ad and data_multiome_annotated_BMMC_ATAC.h5ad you have to use a HPCSystem as it requires more resources than local OS.**
 
-| Dataset        | Type       | File                                        | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | TRAIN_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
+| Dataset        | Type       | File                                        | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | INTER_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
 |----------------|------------|---------------------------------------------|----------------|---------------------------|---------------------|---------------------|-------------------------------------------------------------------------------------|--------------------------|
-| Pancreas       | scRNA-seq  | "pancreas.h5ad"                             | "batch"        | "celltype"                | "0"                 | "3"                 | "['0', '1', '2']"                                                                    | 5                        |
+| Pancreas       | scRNA-seq  | "pancreas.h5ad"                             | "batch"        | "celltype"                | "0"                 | "3"                 | "['1', '2']"                                                                    | 5                        |
 | NSCLC Lung     | scRNA-seq  | "NSCLC_lung_NORMALIZED_FILTERED.h5ad"      | "Donor"        | "predicted_labels_majority"| "Donor5"           | "Donor2"           | "['Donor0', 'Donor1', 'Donor3', 'Donor4', 'Donor6']"                            | 20                       |
 | Neurips Brain  | scRNA-seq  | "All_human_brain.h5ad"                      | "batch"        | "label"                    | "C4"                | "C7"                | "['AD2', 'ADx1', 'ADx2', 'ADx4']"                                                    | 100                      |
 | BMMC           | scATAC-seq | "data_multiome_annotated_BMMC_ATAC.h5ad"   | "batch"        | "cell_type"                | "s4d8"              | "s3d3"              | "['s1d1', 's1d2', 's1d3', 's2d1', 's2d4', 's2d5', 's3d10', 's4d1']"                 | 18                       |

@@ -35,9 +35,12 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'run-jind-multi=cluster.main:main',
-            'compare-methods=cluster.compare_methods:main',
+            'run-jind-multi=jind_multi.main:main',
+            'compare-methods=jind_multi.compare_methods:main',
         ],
     },
     zip_safe=False
 )
+
+
+ 

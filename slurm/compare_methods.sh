@@ -24,7 +24,6 @@ LABELS_COL="celltype"
 SOURCE_DATASET_NAME="0"
 TARGET_DATASET_NAME="3"     
 OUTPUT_PATH="$SCRIPT_DIR/../output/pancreas"
-TRAIN_DATASETS_NAMES="['0', '1', '2']"
 NUM_FEATURES=5000
 MIN_CELL_TYPE_POPULATION=5
 USE_GPU=True  
@@ -46,15 +45,14 @@ do
   echo "USE_GPU: $USE_GPU"
 
   # Execute the Python script
-  python -u "$SCRIPT_DIR/compare_methods.py" \
-    --PATH "$DATA_PATH" \
-    --BATCH_COL "$BATCH_COL" \
-    --LABELS_COL "$LABELS_COL" \
-    --SOURCE_DATASET_NAME "$SOURCE_DATASET_NAME" \
-    --TARGET_DATASET_NAME "$TARGET_DATASET_NAME" \
-    --OUTPUT_PATH "$OUTPUT_PATH" \
-    --N_TRIAL "$N_TRIAL" \
-    --NUM_FEATURES "$NUM_FEATURES" \
-    --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION" \
-    --USE_GPU "$USE_GPU"
+  compare-methods --PATH "$DATA_PATH" \
+                  --BATCH_COL "$BATCH_COL" \
+                  --LABELS_COL "$LABELS_COL" \
+                  --SOURCE_DATASET_NAME "$SOURCE_DATASET_NAME" \
+                  --TARGET_DATASET_NAME "$TARGET_DATASET_NAME" \
+                  --OUTPUT_PATH "$OUTPUT_PATH" \
+                  --N_TRIAL "$N_TRIAL" \
+                  --NUM_FEATURES "$NUM_FEATURES" \
+                  --MIN_CELL_TYPE_POPULATION "$MIN_CELL_TYPE_POPULATION" \
+                  --USE_GPU "$USE_GPU"
 done

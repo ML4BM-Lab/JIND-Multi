@@ -1,6 +1,6 @@
 /results
 /jind_multi/__pycache__
-/cluster/__pycache__
+/slurm/__pycache__
 *.txt
 *.egg-info
 *.h5ad
@@ -9,3 +9,6 @@ config_try.json
 .DS_Store
 resources/
 resources.zip
+slurm/review_simulations
+/logs
+/output

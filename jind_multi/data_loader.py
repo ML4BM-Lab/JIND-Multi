@@ -5,7 +5,10 @@ import warnings
 import ast
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset
-from .utils import dimension_reduction, preprocess, filter_cells, create_scanpy_embeddings, create_scanpy_umap, create_umap_from_dataframe
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+from .utils import dimension_reduction, preprocess, filter_cells
 from .config_loader import get_config
 
 def load_and_process_data(args, config={}):
@@ -15,21 +18,24 @@ def load_and_process_data(args, config={}):
         adata = sc.read(args.PATH)
         adata.var_names_make_unique()
     except OSError as e:
-        # Add a warning and raise an error for the specific issue
-        warnings.warn(f"Failed to read the H5AD file at {args.PATH}. The file may be corrupted or incomplete.")
-        raise RuntimeError(f"Error reading H5AD file: {e}")
+        raise RuntimeError(f"Failed to read the H5AD file at {args.PATH}. The file may be corrupted or incomplete.")
     # Filter and verify the data
     data = filter_and_verify_data(adata, args)
-   # Process the data
+    # Process the data
     data = preprocess_data(data, config)
     return data
 
 def filter_and_verify_data(adata, args):
-    # Select the desired batches
-    train_datasets_names = getattr(args, 'TRAIN_DATASETS_NAMES', None)
-    if train_datasets_names:
-        selected_batches = list(dict.fromkeys([args.SOURCE_DATASET_NAME] + ast.literal_eval(args.TRAIN_DATASETS_NAMES) + [args.TARGET_DATASET_NAME]))
-        adata = adata[adata.obs[args.BATCH_COL].isin(selected_batches)]
+    exclude_datasets_names = getattr(args, 'EXCLUDE_DATASETS_NAMES')
+    if exclude_datasets_names:
+        print(f'Excluding batches {exclude_datasets_names} from your data')
+        exclude_list = ast.literal_eval(exclude_datasets_names)
+        print(f'🔍 exclude_list evaluado: {exclude_list}')
+        for i, val in enumerate(exclude_list):
+            print(f"🔹 Elemento {i}: {val} (type: {type(val)})")
+        selected_batches = list(dict.fromkeys(exclude_list))
+        adata = adata[~adata.obs[args.BATCH_COL].isin(selected_batches)]
+    
     # Convert to DataFrame and add columns
     data = adata.to_df()
     data['batch'] = adata.obs[args.BATCH_COL]
@@ -41,10 +47,11 @@ def filter_and_verify_data(adata, args):
     return data
 
 def check_dataset_entries(data, args):
-    # Check if the source dataset has at least 2 entries
-    source_entries = data[data['batch'] == args.SOURCE_DATASET_NAME]
-    if source_entries.shape[0] <= 1:
-        raise ValueError(f"Error: The source dataset {args.SOURCE_DATASET_NAME} has less than 2 entries. Please ensure this batch name is valid and the dataset contains enough samples.")
+    # Check if the source dataset has at least 2 entries if user set a source dataset
+    if getattr(args, 'SOURCE_DATASET_NAME', None):
+        source_entries = data[data['batch'] == args.SOURCE_DATASET_NAME]
+        if source_entries.shape[0] <= 1:
+            raise ValueError(f"Error: The source dataset {args.SOURCE_DATASET_NAME} has less than 2 entries. Please ensure this batch name is valid and the dataset contains enough samples.")
     
     # Check if the target dataset has at least 2 entries
     target_entries = data[data['batch'] == args.TARGET_DATASET_NAME]
@@ -52,8 +59,8 @@ def check_dataset_entries(data, args):
         raise ValueError(f"Error: The target dataset {args.TARGET_DATASET_NAME} has less than 2 entries. Please ensure this batch name is valid and the dataset contains enough samples.")
     
     # Check if train datasets have at least 2 entries
-    if getattr(args, 'TRAIN_DATASETS_NAMES', None):
-        train_batches = ast.literal_eval(args.TRAIN_DATASETS_NAMES)
+    if getattr(args, 'INTER_DATASETS_NAMES', None):
+        train_batches = ast.literal_eval(args.INTER_DATASETS_NAMES)
         for batch_name in train_batches:
             batch_entries = data[data['batch'] == batch_name]
             if batch_entries.shape[0] <= 1:
