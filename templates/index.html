@@ -9,24 +9,22 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
-<body>
-    <div class=container  style="text-align: center;" >
-        <div class="card">
-            <div class="card-body">
-                <h1 class="card-title" style="text-align: center;">Jind Multi</h1>
-                <div class="col d-flex justify-content-center">
-                    <div class="card" style="width: 24rem;">
-                        <p>
-                            <strong>📂 Upload your file to get started!</strong>
-                        </p>
-                        <form id="uploadForm" enctype="multipart/form-data">
-                            <img src="{{ url_for('static',filename='/images/subir-archivo.gif')}}" class="card-img-top"
-                            alt="...">
-                            <input type="file" name="archivo" accept=".csv">
-                            <input type="submit" value="Upload">
-                            <h1 id="charged"></h1>
-                        </form>
-                    </div>
+<body >
+    <div id="box_1" class=container>
+        <div  id="box_1" class="card">
+            <div id="box_2" class="card-header">Jind Multi</div>
+            <div  class="card-body">
+                <div class="card" style="width: 24rem;">
+                    <p>
+                        <strong>📂 Upload your file to get started!</strong>
+                    </p>
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <img src="{{ url_for('static',filename='/images/subir-archivo.gif')}}" class="card-img-top"
+                        alt="...">
+                        <input type="file" name="archivo" accept=".csv">
+                        <input type="submit" value="Upload">
+                        <h1 id="charged"></h1>
+                    </form>
                 </div>
             </div>
         </div>
@@ -47,7 +45,7 @@
                 icon.classList.add('bi-chevron-compact-down');
             }
         };
-    +});
+    });
     document.addEventListener("DOMContentLoaded", function () {
                 // Manejador de evento para el formulario
                 const form = document.getElementById("uploadForm");
