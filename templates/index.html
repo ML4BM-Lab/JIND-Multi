@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Jind Multi</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css')}}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class=container  style="text-align: center;" >
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title" style="text-align: center;">Jind Multi</h1>
+                <div class="col d-flex justify-content-center">
+                    <div class="card" style="width: 24rem;">
+                        <p>
+                            <strong>📂 Upload your file to get started!</strong>
+                        </p>
+                        <form id="uploadForm" enctype="multipart/form-data">
+                            <img src="{{ url_for('static',filename='/images/subir-archivo.gif')}}" class="card-img-top"
+                            alt="...">
+                            <input type="file" name="archivo" accept=".csv">
+                            <input type="submit" value="Upload">
+                            <h1 id="charged"></h1>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+        function toggleIcon(button) {
+            console.log('Button clicked');
+            var icon = button.querySelector('i');
+            if (icon.classList[1] == 'bi-chevron-compact-down') {
+                icon.classList.remove('bi-chevron-compact-down');
+                icon.classList.add('bi-chevron-compact-up');
+            } else {
+                icon.classList.remove('bi-chevron-compact-up');
+                icon.classList.add('bi-chevron-compact-down');
+            }
+        };
+    +});
+    document.addEventListener("DOMContentLoaded", function () {
+                // Manejador de evento para el formulario
+                const form = document.getElementById("uploadForm");
+                form.addEventListener("submit", function (event) {
+                    event.preventDefault(); // Prevenir el envío por defecto
+
+                    const formData = new FormData(form);
+
+                    fetch("/", {
+                        method: "POST",
+                        body: formData
+                    })
+                        .then(response => response.text()) // Obtener el texto de la respuesta
+                        .then(text => {
+                            // Actualizar el contenido del h1 con id "charged"
+                            document.getElementById("charged").innerText = text;
+                        })
+                        .catch(error => {
+                            document.getElementById("charged").innerText = "Error al enviar el formulario: " + error.message;
+                        });
+                });
+            })
+</script>
+</body>
