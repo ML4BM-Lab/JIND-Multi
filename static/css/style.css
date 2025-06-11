@@ -3098,16 +3098,42 @@ body {
   align-items: center;
 }
 
-.encabezadol{
+/* .encabezadol{
   width : 250px !important;
   height : 140px !important;
 }
 .encabezado2{
   width : 360px !important;
   height : 200px !important;
+} */
+
+.encabezadol {
+  max-width: 200px;     /* Establece un tamaño máximo común para todas las imágenes */
+  height: auto;         /* Mantiene la proporción de la imagen */
+  display: block;       /* Asegura que no haya espacios extra alrededor */
+  margin: 0 auto;       /* Centra la imagen si el contenedor es más ancho */
 }
+
+.coli {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50%;
+  margin-bottom: 50%;
+  margin-left: 50%;
+  margin-right: 50%;
+}
+
 #box_1{
   width: 32rem;
+  align-items: center; 
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#box_3{
   align-items: center; 
   margin-left: 20px;
   margin-right: 20px;
