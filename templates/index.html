@@ -24,7 +24,7 @@
                             <form id="uploadForm" action="{{ url_for('uploadf') }}" method="post" enctype="multipart/form-data">
                                 <img src="{{ url_for('static',filename='/images/subir-archivo.gif')}}"
                                     class="card-img-top" alt="...">
-                                <input type="file" name="archivos" accept=".h5ad, .json" multiple>
+                                <input type="file" name="archivos" accept=".json">
                                 <input type="submit" value="Upload">
                                 {% if file_info %}
                                     <h2>Uploaded Files:</h2>
