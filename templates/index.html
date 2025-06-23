@@ -39,6 +39,14 @@
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
+                                {% if result %}
+                                 <h2>Command Output</h2>
+                                <pre>
+                                    {% for result in results %}
+                                        {{ result }}
+                                    {% endfor %}
+                                </pre>
+                                {% endif %}
                             </form>
 
                         </div>
