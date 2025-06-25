@@ -8,45 +8,43 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css')}}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 
 <body>
-    <div  class=container>
+    <div class=container>
         <div class="row ">
             <div class="col d-flex justify-content-center">
                 <div id="box_1" class="card">
                     <div id="box_2" class="card-header">Jind Multi</div>
                     <div class="card-body">
-                        <div class="card" style="width: 24rem;">
+                        <div class="card" style="width: 32rem;">
                             <p>
                                 <strong>📂 Upload your file to get started!</strong>
                             </p>
-                            <form id="uploadForm" action="{{ url_for('uploadf') }}" method="post" enctype="multipart/form-data">
+                            <form id="uploadForm" action="{{ url_for('uploadf') }}" method="post"
+                                enctype="multipart/form-data">
                                 <img src="{{ url_for('static',filename='/images/subir-archivo.gif')}}"
                                     class="card-img-top" alt="...">
                                 <input type="file" name="archivos" accept=".json">
-                                <input type="submit" value="Upload">
+                                <input type="submit" id="uploadButton" value="Upload">
                                 {% if file_info %}
-                                    <h2>Uploaded Files:</h2>
-                                    <ul>
-                                        {% for info in file_info %}
-                                            <li>
-                                                <!-- Display the placeholder image -->
-                                                <img src="{{ url_for('static', filename='images/file.png') }}" width="50" alt="File Icon">
-                                                <!-- Display the file name -->
-                                                {{ info.filename }}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                                {% if result %}
-                                 <h2>Command Output</h2>
-                                <pre>
-                                    {% for result in results %}
-                                        {{ result }}
+                                <h2>Uploaded Files:</h2>
+                                <ul>
+                                    {% for info in file_info %}
+                                    <li>
+                                        <!-- Display the placeholder image -->
+                                        <img src="{{ url_for('static', filename='images/file.png') }}" width="50"
+                                            alt="File Icon">
+                                        <!-- Display the file name -->
+                                        {{ info.filename }}
+                                    </li>
+                                    <button onclick="runCommand()">Run Model</button>
                                     {% endfor %}
-                                </pre>
+                                </ul>
                                 {% endif %}
+                                <h2>Command Output</h2>
+                                <div id="console"></div>
                             </form>
 
                         </div>
@@ -76,7 +74,27 @@
             </div>
         </div>
     </div>
+    <script>
 
+        var socket = io();
+
+        socket.on('connect', () => {
+            console.log("Connected to server");
+        });
+
+        socket.on('console_output', function(msg) {
+            var consoleDiv = document.getElementById('console');
+            consoleDiv.innerHTML += msg.data;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;  // Scroll to bottom
+        });
+
+
+       function runCommand() {
+            console.log("Redirecting to /run");
+            window.location.href = '/run';
+        }
+
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

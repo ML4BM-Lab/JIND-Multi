@@ -3160,3 +3160,13 @@ p{
   text-align: justify;
   padding: 0.75rem 1.25rem !important;
 } 
+#console {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #343a40 !important;
+            color:white !important;
+            white-space: pre-wrap; 
+             overflow-y: scroll;
+        }
