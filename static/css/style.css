@@ -3170,3 +3170,6 @@ p{
             white-space: pre-wrap; 
              overflow-y: scroll;
         }
+h2{
+  margin: 1rem;
+}

@@ -7,12 +7,15 @@ import subprocess
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_socketio import SocketIO,emit
 from flask_bootstrap import Bootstrap5
+# import eventlet
 
+# eventlet.monkey_patch()
 app = Flask(__name__)
 secret_key = secrets.token_hex(32)
 print("Your secret key:", secret_key)
 app.secret_key = secret_key
 bootstrap = Bootstrap5(app)
+# socketio = SocketIO(app,async_mode='eventlet', cors_allowed_origins="*")
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # class ConsoleLogger:
@@ -40,6 +43,7 @@ def uploadf():
     results = []
     file_info = []
     file_path = "C:/Users/jsilvarojas/source/repos/JIND-Multi/"
+    # file_path = "/app/"
     file_json = "config.json"
     
     for file in files:
@@ -77,11 +81,17 @@ def uploadf():
 
     return render_template('index.html', file_info=file_info, results=results)
 
-@app.route("/run", methods=['GET','POST'])
+@app.route("/test_emit")
+def test_emit():
+    socketio.emit('console_output', {'data': 'Test message from server'}, broadcast=True)
+    return "Test message emitted"
+
+
+@app.route("/run", methods=['POST'])
 def run():
     """Executes the subprocess command and emits output via WebSockets."""
     file_json = "config.json"
-    command = ['run-jind-multi', '--config', file_json]
+    command = ['run-jind-multi','--config',file_json]
     print(command)
     print("corriendo modelo")
     socketio.emit('console_output', {'data': "corriendo modelo\n"},broadcast=True)
@@ -103,7 +113,7 @@ def run():
 
         emit_output(process.stdout)
         emit_output(process.stderr)
-
+    
         process.stdout.close()
         process.stderr.close()
         process.wait()
@@ -121,4 +131,4 @@ def run():
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5003)
+    socketio.run(app, host='0.0.0.0', debug=True, port=5003)
