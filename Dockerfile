@@ -4,6 +4,10 @@ FROM python:3.7.16-slim
 # Establece el directorio de trabajo
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    jq \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copia el archivo de requisitos
 COPY requirements.txt .
 
@@ -13,6 +17,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia el resto del código fuente al contenedor
 COPY . .
 
+COPY start.sh /app/start.sh
+
+RUN chmod +x /app/start.sh
+
 # Exponer el puerto para la aplicación
 EXPOSE 5003
 
@@ -21,4 +29,5 @@ RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
 # Define el comando por defecto para ejecutar tu aplicación
-CMD ["gunicorn", "--bind", "0.0.0.0:5003", "index:app"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:5003", "index:app"]
+CMD ["/app/start.sh"]

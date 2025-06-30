@@ -7,6 +7,7 @@ import subprocess
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_socketio import SocketIO,emit
 from flask_bootstrap import Bootstrap5
+
 # import eventlet
 
 # eventlet.monkey_patch()
@@ -17,7 +18,7 @@ app.secret_key = secret_key
 bootstrap = Bootstrap5(app)
 # socketio = SocketIO(app,async_mode='eventlet', cors_allowed_origins="*")
 socketio = SocketIO(app, cors_allowed_origins="*")
-
+file_json = "config.json"
 # class ConsoleLogger:
 #     def __init__(self, socketio):
 #         self.socketio = socketio
@@ -33,6 +34,55 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 def home():
     return render_template('index.html')
 
+
+@app.route("/config", methods=['POST'])
+def config():
+    
+    BATCH_COL =  request.form.get('campo1', '')
+    LABELS_COL =  request.form.get('campo2', '')
+    SOURCE_DATASET_NAME =  request.form.get('campo3', '')
+    TARGET_DATASET_NAME =  request.form.get('campo4', '')
+    INTER_DATASETS_NAMES =  request.form.get('campo5', '')
+    EXCLUDE_DATASETS_NAMES =  request.form.get('campo6', '')
+    MIN_CELL_TYPE_POPULATION =  request.form.get('campo7', '') 
+    
+    if BATCH_COL != '':
+        config['BATCH_COL'] = BATCH_COL
+        print(f"Valor de campo1: {BATCH_COL}")
+    if LABELS_COL != '':
+        config['LABELS_COL'] = LABELS_COL
+        print(f"Valor de campo2: {LABELS_COL}")
+    if SOURCE_DATASET_NAME != '':
+        config['SOURCE_DATASET_NAME'] = SOURCE_DATASET_NAME
+        print(f"Valor de campo3: {SOURCE_DATASET_NAME}")
+    if BATCH_COL != '':
+        config['TARGET_DATASET_NAME'] = TARGET_DATASET_NAME
+        print(f"Valor de campo4: {TARGET_DATASET_NAME}")
+    if BATCH_COL != '':
+        config['INTER_DATASETS_NAMES'] = INTER_DATASETS_NAMES
+        print(f"Valor de campo5: {INTER_DATASETS_NAMES}")
+    if BATCH_COL != '':
+        config['EXCLUDE_DATASETS_NAMES'] = EXCLUDE_DATASETS_NAMES
+        print(f"Valor de campo6: {EXCLUDE_DATASETS_NAMES}")
+    if BATCH_COL != '':
+        config['MIN_CELL_TYPE_POPULATION'] = MIN_CELL_TYPE_POPULATION
+        print(f"Valor de campo7: {MIN_CELL_TYPE_POPULATION}")
+
+    if os.path.getsize(file_json) == 0:
+        flash(f"The JSON configuration file {file_json} is empty.")
+        
+
+    with open(file_json, 'r') as json_file:
+        try:
+            config = json.load(json_file)
+        except json.JSONDecodeError as e:
+            flash(f"Invalid JSON in file: {file_json} - {str(e)}")
+        
+    with open(file_json, 'w') as json_file:
+                json.dump(config, json_file, indent=4)
+
+    return render_template('index.html')
+
 @app.route("/upload", methods=['POST'])
 def uploadf():
     if 'archivos' not in request.files:
@@ -42,9 +92,8 @@ def uploadf():
     files = request.files.getlist('archivos')
     results = []
     file_info = []
-    file_path = "C:/Users/jsilvarojas/source/repos/JIND-Multi/"
-    # file_path = "/app/"
-    file_json = "config.json"
+    # file_path = "C:/Users/jsilvarojas/source/repos/JIND-Multi/"
+    file_path = "/app/"
     
     for file in files:
         if file.filename == '':
@@ -59,18 +108,8 @@ def uploadf():
                 print(file_path)
                 file.save(file_path)
 
-                if os.path.getsize(file_json) == 0:
-                    flash(f"The JSON configuration file {file_json} is empty.")
-                    continue
-
-                with open(file_json, 'r') as json_file:
-                    try:
-                        config = json.load(json_file)
-                    except json.JSONDecodeError as e:
-                        flash(f"Invalid JSON in file: {file_json} - {str(e)}")
-                        continue
-
                 config['PATH'] = file_path
+               
                 with open(file_json, 'w') as json_file:
                     json.dump(config, json_file, indent=4)
 

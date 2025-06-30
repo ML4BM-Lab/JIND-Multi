@@ -21,36 +21,40 @@
                         <h2>Model configuration parameters</h2>
                         <div class="row justify-content-center">
                             <div class="card col-lg-10 ">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="campo1" class="form-label">BATCH_COL</label>
-                                        <input type="text" name="campo1" id="campo1" class="form-control" />
+                                <form method="POST" action="{{ url_for('config') }}">
+                                    <div class="form-group row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="campo1" class="form-label">BATCH_COL</label>
+                                            <input type="text" name="campo1" id="campo1" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="campo2" class="form-label">LABELS_COL</label>
+                                            <input type="text" name="campo2" id="campo2" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="campo3" class="form-label">SOURCE_DATASET_NAME</label>
+                                            <input type="text" name="campo3" id="campo3" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="campo4" class="form-label">TARGET_DATASET_NAME</label>
+                                            <input type="text" name="campo4" id="campo4" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="campo5" class="form-label">INTER_DATASETS_NAMES</label>
+                                            <input type="text" name="campo5" id="campo5" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="campo6" class="form-label">EXCLUDE_DATASETS_NAMES</label>
+                                            <input type="text" name="campo6" id="campo6" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="campo7" class="form-label">MIN_CELL_TYPE_POPULATION</label>
+                                            <input type="text" name="campo7" id="campo7" class="form-control" />
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="campo2" class="form-label">LABELS_COL</label>
-                                        <input type="text" name="campo2" id="campo2" class="form-control" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="campo3" class="form-label">SOURCE_DATASET_NAME</label>
-                                        <input type="text" name="campo3" id="campo3" class="form-control" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="campo4" class="form-label">TARGET_DATASET_NAME</label>
-                                        <input type="text" name="campo4" id="campo4" class="form-control" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="campo5" class="form-label">INTER_DATASETS_NAMES</label>
-                                        <input type="text" name="campo5" id="campo5" class="form-control" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="campo6" class="form-label">EXCLUDE_DATASETS_NAMES</label>
-                                        <input type="text" name="campo6" id="campo6" class="form-control" />
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="campo7" class="form-label">MIN_CELL_TYPE_POPULATION</label>
-                                        <input type="text" name="campo7" id="campo7" class="form-control" />
-                                    </div>
-                                </div>
+                                    <input type="submit" id="uploadButton" value="Upload configuration">
+                                </form>
+                                <p>The information to modify the model configuration can be found in the <a href="https://github.com/ML4BM-Lab/JIND-Multi">github repository</a></p>
                             </div>
                         </div>
                         <div class="card" style="width: 32rem;">
@@ -62,7 +66,7 @@
                                 <img src="{{ url_for('static',filename='/images/subir-archivo.gif')}}"
                                     class="card-img-top" alt="...">
                                 <input type="file" name="archivos" accept=".json">
-                                <input type="submit" id="uploadButton" value="Upload">
+                                <input type="submit" id="uploadButton" value="Upload file">
                             </form>
                                 {% if file_info %}
                                 <h2>Uploaded Files:</h2>
