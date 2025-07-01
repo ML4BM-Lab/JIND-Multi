@@ -3,19 +3,21 @@ FROM python:3.7.16-slim
 
 # Establece el directorio de trabajo
 WORKDIR /app
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
     jq \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia el archivo de requisitos
 COPY requirements.txt .
 
-# Instala las dependencias de Python del archivo requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
 # Copia el resto del código fuente al contenedor
 COPY . .
+
+# Instala las dependencias de Python del archivo requirements.txt
+RUN pip install -e .
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY start.sh /app/start.sh
 

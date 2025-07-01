@@ -56,11 +56,16 @@ case $option in
             b)
                 read -p "Enter new value for PATH (app/name_of_file_to_process): " PATH
                 jq --arg value "$path" '.model_configuration.PATH = $path' "$JSON_FILE" > tmp.$$.json && mv tmp.$$.json "$JSON_FILE"
-
-                echo "BATCH_COL has been updated in $JSON_FILE"
+					
+                echo "PATH has been updated in $JSON_FILE"
 				;;
 		esac
-        exec python run-jind-multi --config "config.json"
+		
+		
+		echo 'export PATH=$PATH:/usr/local/bin' >> ~/.bashrc
+		source ~/.bashrc
+
+        exec run-jind-multi --config "config.json"
         ;;
     *)
         echo "Invalid option."
