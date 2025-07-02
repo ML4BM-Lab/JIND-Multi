@@ -4,31 +4,19 @@ import time
 import json
 import secrets
 import subprocess
+import threading
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_socketio import SocketIO,emit
 from flask_bootstrap import Bootstrap5
 
-# import eventlet
-
-# eventlet.monkey_patch()
 app = Flask(__name__)
 secret_key = secrets.token_hex(32)
 print("Your secret key:", secret_key)
 app.secret_key = secret_key
 bootstrap = Bootstrap5(app)
-# socketio = SocketIO(app,async_mode='eventlet', cors_allowed_origins="*")
 socketio = SocketIO(app, cors_allowed_origins="*")
-file_json = "config.json"
-# class ConsoleLogger:
-#     def __init__(self, socketio):
-#         self.socketio = socketio
-
-#     def write(self, message):
-#         if message.strip():  # Evita enviar líneas vacías
-#             self.socketio.emit('console_output', {'data': message})
-
-#     def flush(self):
-#         pass
+file_json = "/app/config.json"
+# file_json = "config.json"
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
@@ -107,12 +95,14 @@ def uploadf():
                 file_path = os.path.join(file_path, file.filename)
                 print(file_path)
                 file.save(file_path)
-
+                with open(file_json, 'r') as json_file:
+                    try:
+                        config = json.load(json_file)
+                    except json.JSONDecodeError as e:
+                        flash(f"Invalid JSON in file: {file_json} - {str(e)}")
                 config['PATH'] = file_path
-               
                 with open(file_json, 'w') as json_file:
-                    json.dump(config, json_file, indent=4)
-
+                        json.dump(config, json_file, indent=4)
         except Exception as e:
             flash(f"Error processing file {file.filename}: {str(e)}")
             results.append(f"Unexpected error: {str(e)}")
@@ -129,7 +119,7 @@ def test_emit():
 @app.route("/run", methods=['POST'])
 def run():
     """Executes the subprocess command and emits output via WebSockets."""
-    file_json = "config.json"
+    # file_json = "config.json"
     command = ['run-jind-multi','--config',file_json]
     print(command)
     print("corriendo modelo")
@@ -141,7 +131,7 @@ def run():
         )
 
         # Emit output from subprocess
-        def emit_output(stream):
+        def emit_output(stream, label):
            for line in stream:
                 # Asegúrate de emitir solo líneas no vacías
                 if line.strip():
@@ -149,12 +139,16 @@ def run():
                     socketio.emit('console_output', {'data': line})
                     socketio.sleep(0)
                 socketio.sleep(0)
+                
+        # emit_output(process.stdout)
+        # emit_output(process.stderr)
+        # threading.Thread(target=emit_output, args=(process.stdout,), daemon=True).start()
+        # threading.Thread(target=emit_output, args=(process.stderr,), daemon=True).start()
+        socketio.start_background_task(emit_output, process.stdout, 'STDOUT')
+        socketio.start_background_task(emit_output, process.stderr, 'STDERR')
+        # process.stdout.close()
+        # process.stderr.close()
 
-        emit_output(process.stdout)
-        emit_output(process.stderr)
-    
-        process.stdout.close()
-        process.stderr.close()
         process.wait()
 
         return f"Command executed successfully: {process.returncode}"

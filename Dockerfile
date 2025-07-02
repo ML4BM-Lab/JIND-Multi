@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY start.sh /app/start.sh
 
 RUN chmod +x /app/start.sh
+RUN chmod 777 /app/config.json
 
 # Exponer el puerto para la aplicación
 EXPOSE 5003
