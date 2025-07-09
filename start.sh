@@ -54,8 +54,9 @@ case $option in
 				;;
                 
             b)
-                read -p "Enter new value for PATH (app/name_of_file_to_process): " PATH
-                jq --arg value "$path" '.model_configuration.PATH = $path' "$JSON_FILE" > tmp.$$.json && mv tmp.$$.json "$JSON_FILE"
+                read -p "Enter new value for PATH (app/name_of_file_to_process): " new_path
+                # jq --arg value "$new_path" '.model_configuration.PATH = $value' "$JSON_FILE" > tmp.$$.json && mv tmp.$$.json "$JSON_FILE"
+				jq --arg value "$new_path" '.PATH = $value' "$JSON_FILE" > tmp.$$.json && mv tmp.$$.json "$JSON_FILE"
 					
                 echo "PATH has been updated in $JSON_FILE"
 				;;
