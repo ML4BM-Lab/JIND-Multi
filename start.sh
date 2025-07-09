@@ -62,10 +62,18 @@ case $option in
 		esac
 		
 		
-		echo 'export PATH=$PATH:/usr/local/bin' >> ~/.bashrc
-		source ~/.bashrc
+		export PATH=$PATH:/usr/local/bin
 
-        exec run-jind-multi --config "config.json"
+		# Cambiar al directorio deseado, por ejemplo, /app o donde necesites
+		cd /app || exit
+
+		# Verificar si el comando está disponible
+		if command -v run-jind-multi >/dev/null 2>&1; then
+			echo "run-jind-multi encontrado, ejecutando..."
+			run-jind-multi --config "config.json"
+		else
+			echo "run-jind-multi no encontrado"
+		fi 
         ;;
     *)
         echo "Invalid option."

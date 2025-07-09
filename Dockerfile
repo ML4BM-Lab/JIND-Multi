@@ -33,4 +33,4 @@ USER appuser
 
 # Define el comando por defecto para ejecutar tu aplicación
 # CMD ["gunicorn", "--bind", "0.0.0.0:5003", "index:app"]
-CMD ["/app/start.sh"]
+CMD ["/bin/bash","/app/start.sh"]
