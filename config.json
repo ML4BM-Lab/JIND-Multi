@@ -1,12 +1,12 @@
 {
-    "PATH": "/app/pancreas.h5ad",
-    "BATCH_COL": "batch",
-    "LABELS_COL": "celltype",
-    "SOURCE_DATASET_NAME": "0",
-    "TARGET_DATASET_NAME": "3",
-    "OUTPUT_PATH": "/app/results",
-    "TRAIN_DATASETS_NAMES": "['0', '1', '2']",
-    "NUM_FEATURES": 5000,
-    "MIN_CELL_TYPE_POPULATION": 5,
-    "USE_GPU": true
+  "PATH": "",
+  "BATCH_COL": "batch",
+  "LABELS_COL": "celltype",
+  "SOURCE_DATASET_NAME": "0",
+  "TARGET_DATASET_NAME": "3",
+  "OUTPUT_PATH": "/app/results",
+  "INTER_DATASETS_NAMES": "['0', '1', '2']",
+  "NUM_FEATURES": 5000,
+  "MIN_CELL_TYPE_POPULATION": 5,
+  "USE_GPU": true
 }

@@ -89,11 +89,50 @@ sbatch main.sh
 ## 🐳 Option 3: Docker Execution
 If you prefer to avoid local installations, you can run JIND-Multi inside a Docker container.
 
-To launch the container:
+#### Option 3.1: Using a pre-built Docker image
 
-...
+1. Pull the pre-built Docker image:
+
+    ```bash
+    docker pull xgarrotesan/jind_multi
+    ```
+
+2. Run the Docker container, replacing `<PATH>` with the absolute path to the folder on your system that contains the JIND-Multi repository and the `.h5ad` data files:
+
+    ```bash
+    docker run -it -p 5003:5003 -v <PATH>:/app xgarrotesan/jind_multi
+    ```
+You can also integrate it with the JIND-Multi WebTool for an even smoother experience.
+- to run with webTool select opcion 1 
+- to run in bash select opcion 2
+#### Option 3.2: Building the Docker image locally
+
+If you prefer to build the Docker image locally using the provided Dockerfile:
+
+<!-- 1. Clone the repository if you haven't already:
+  ```bash
+  git clone https://github.com/ML4BM-Lab/JIND-Multi.git
+  cd JIND-Multi -->
+
+0. Go to repository folder absolute path in our case <PATH>
+  ```bash
+    cd <PATH>  
+  ```
+1. Build the Docker image locally:
+  ```bash
+    docker build --no-cache -t jind_multi:latest . 
+  ```
+
+2. Run the Docker container, ensuring that you map the local path to the folder containing both the repository and .h5ad files. Replace <PATH> with the absolute path to your system's directory:
+
+  ```bash
+    docker run -it -p 5003:5003 -v <PATH>:/app jind_multi
+  ```
 
 You can also integrate it with the JIND-Multi WebTool for an even smoother experience.
+
+- to run with webTool select opcion 1 
+- to run in bash select opcion 2
 
 # Compare JIND Methods
 
