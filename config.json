@@ -1,5 +1,5 @@
 {
-  "PATH": "/app/pancreas_step_2_2k_batch0-2k_batch2-1.h5ad",
+  "PATH": "",
   "BATCH_COL": "batch",
   "LABELS_COL": "celltype",
   "SOURCE_DATASET_NAME": "0",
