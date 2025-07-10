@@ -24,256 +24,121 @@ Leveraging multiple annotated datasets, such as those in an atlas, **JIND-Multi*
     <img src="https://github.com/ML4BM-Lab/JIND-Multi/blob/master/JIND.png" alt="JIND-Multi Logo" width="700">
 </p>
 
-## Prerequisites without Docker
+## Prerequisites for Running Locally
 
 - **Operating System:** Linux or macOS
 - **Environment Manager:** [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 - **Programming Language:** Python 3.6.8 or higher
-- **Hardware:** CPU or NVIDIA GPU + CUDA CuDNN
+- **Hardware:** A CPU is sufficient, but using an NVIDIA GPU with CUDA and cuDNN is recommended for better performance.
 
-## Installation
-To install **JIND-Multi**, follow these steps:
 
-```bash
-git clone https://github.com/ML4BM-Lab/JIND-Multi.git
-cd JIND-Multi
-conda create -n jind python=3.7.16 
-conda activate jind
-pip install -e .
-```
+## 📁 Required Inputs & Configuration Options
 
-## Data
-The datasets used to reproduce the results presented in the manuscript are available at the following link: https://doi.org/10.5281/zenodo.14000644.
+To run JIND-Multi, whether you're training from scratch or using pre-trained models, you need to provide a `.h5ad` file containing your single-cell data and define a few key parameters. Below is a list of required and optional arguments, their types, and what they represent.
 
-Please note that if you are using any of the datasets published on Zenodo, refer to the table [`Input Arguments Information`](#input-arguments-information) at the end of this README to correctly add the input arguments.
+| Argument                   | Type     | Required | Description |
+|---------------------------|----------|----------|-------------|
+| `PATH`                    | `string` | ✅       | Path to the input `.h5ad` file. This file must contain your annotated single-cell dataset (AnnData object). |
+| `BATCH_COL`               | `string` | ✅       | Name of the column in `adata.obs` that contains batch or donor identifiers. |
+| `LABELS_COL`              | `string` | ✅       | Name of the column in `adata.obs` that contains cell type labels. |
+| `TARGET_DATASET_NAME`     | `string` | ✅       | Name of the target batch (from `BATCH_COL`) to which the cell type annotations will be transferred. |
+| `SOURCE_DATASET_NAME`     | `string` | ❌       | (Optional) Name of the source batch used for training. If not specified, JIND-Multi will automatically select the best source batch based on rejection rate. |
+| `OUTPUT_PATH`             | `string` | ✅       | Path to the directory where output results (metrics, predictions, etc.) will be saved. |
+| `PRETRAINED_MODEL_PATH`   | `string` | ❌       | (Optional) Path to a directory with pre-trained `.pt` model files and a `.json` with thresholds. If provided, the model will skip training and proceed directly to inference. |
+| `INTER_DATASETS_NAMES`    | `string` | ❌       | (Optional) Comma-separated list of intermediate batch names (from `BATCH_COL`) used in multi-step training. Do **not** include the source batch. |
+| `EXCLUDE_DATASETS_NAMES`  | `string` | ❌       | (Optional) Comma-separated list of dataset names to exclude from training. Avoid duplicating entries used in `SOURCE`, `TARGET`, or `INTER`. |
+| `NUM_FEATURES`            | `int`    | ❌       | (Optional) Number of genes to include in the model. Default: `5000`. |
+| `MIN_CELL_TYPE_POPULATION`| `int`    | ❌       | (Optional) Minimum number of cells per cell type per batch required for training. Default: `100`. |
+| `USE_GPU`                 | `bool`   | ❌       | (Optional, but recommended) Set to `True` to train using GPU. Default: `True`. |
 
-# Executing JIND-Multi
-There are three options to execute the JIND-Multi framework: 
-* Running the Python script 
-* Submitting a job to a HPC queue
-* Running with Docker
+### 📌 Notes
 
-### Option 1: Running the Python Script 
-For executing JIND-Multi on the `Brain Neurips` dataset, you can use a `.json` configuration file. The content of the file should be as follows:
+- If `PRETRAINED_MODEL_PATH` is provided, JIND-Multi skips training and uses the given models for inference on the target batch.
+- If `SOURCE_DATASET_NAME` is not specified, the method automatically selects the source batch that minimizes cell rejection when predicting on the target batch.
 
-```json
-{
-    "PATH": "/path/to/data/All_human_brain.h5ad",
-    "BATCH_COL": "batch",
-    "LABELS_COL": "label",
-    "SOURCE_DATASET_NAME": "C4",
-    "TARGET_DATASET_NAME": "C7",
-    "OUTPUT_PATH": "/path/to/save/results",
-    "PRETRAINED_MODEL_PATH": "/path/to/pretrained_model_folder",
-    "INTER_DATASETS_NAMES": "['ADx1']",
-    "EXCLUDE_DATASETS_NAMES": "['AD2']",
-    "NUM_FEATURES": 5000,
-    "MIN_CELL_TYPE_POPULATION": 100,
-    "USE_GPU": true
-}
-```
+## 📤 Output Files and Results Overview
 
-where,
-- **`PATH`**: (string) Path to the file with the data in a `.h5ad` format.
-- **`BATCH_COL`**: (string) Column name with the information of the different batches or donors in your AnnData object.
-- **`LABELS_COL`**: (string) Column name with the different cell types in your AnnData object.
-- **`SOURCE_DATASET_NAME`**: (string) Optional. name of the source batch. If no batch is specified, JIND-Multi will select as source batch the sample that produces the least amount of rejected cells on the target batch when used as source in JIND (i.e., without additional intermediate batches).
-- **`TARGET_DATASET_NAME`**: (string) Name of the target batch to which transfer the annotations from the rest of the datasets.
-- **`OUTPUT_PATH`**: (string) Path where the model performance results will be stored. 
-- **`PRETRAINED_MODEL_PATH`**: (string) Optional. This argument specifies the path to a folder containing pre-trained models. If this path is provided, JIND-Multi will use the models from this folder instead of training new ones to infer on the new target batch. The folder should contain model files `.pt` format and a `.json` file containing the predictions on the validation test set used to compute the thresholds. If this argument is not provided or left empty, the script will proceed to train a new model from scratch based on the provided data.
-- **`INTER_DATASETS_NAMES`**: (string) Optional. A comma-separated list of dataset names. This setting allows to specify the order of intermediate datasets used for training.  The source batch should not be included here. If no specific order is provided, the model will train on the intermediate datasets in the order they appear in the data.
-- **`EXCLUDE_DATASETS_NAMES`**: (string) Optional. A comma-separated list of dataset names to exclude from training. Be careful not to include the same dataset names as in `SOURCE_DATASET_NAME`, `TARGET_DATASET_NAME`, or `INTER_DATASETS_NAMES`. This is typically a variable that you may not need. Only use it if you truly need to exclude specific batches from your analysis.
-- **`NUM_FEATURES`**: (int) Optional. Number of genes to consider for modeling, default is 5000.
-- **`MIN_CELL_TYPE_POPULATION`**: (int) Optional. For each batch, the minimum necessary number of cells per cell type to train. If this requirement is not met in any batch, the cells belonging to this cell type are discarded from all batches, the default is 100 cells.
-- **`USE_GPU`**: (bool) Optional but recommended. Whether to use the GPU to train, default is True.
+After running JIND-Multi, all outputs are stored in the specified `OUTPUT_PATH` directory. These results include both prediction files and detailed performance metrics for model evaluation.
 
-**Note:** The `PRETRAINED_MODEL_PATH` argument is optional and should be provided only if you want to use a pre-trained model. If you do not specify this argument, JIND-Multi will train a new model from scratch based on the provided data.
+### 🧪 Prediction Results
 
-To execute JIND-Multi using the configuration file:
+- **`predicted_label_test_data.xlsx`**  
+  This Excel file contains prediction results for each cell in the **target batch**. For each cell, it includes:
+  - Probabilities assigned by the model for each cell type.
+  - `raw_predictions`: The cell type with the highest probability (before applying thresholds).
+  - `predictions`: The final predicted label after applying cell type-specific thresholds (low-confidence predictions may be marked as _Unknown_).
 
-```bash
-run-jind-multi --config /path/to/config.json
-```
+- **Trained Model Files**  
+  - Trained models for each annotated batch are saved in `.pt` format inside the `trained_models/` directory.
+  - A separate `target.pth` file contains the model trained on the target batch after fine-tuning.
+  - The file `val_stats_trained_model.json` contains the predictions on the validation set used to calculate threshold values per cell type.
 
-Alternatively, you can run JIND-Multi directly from the command line by providing all the necessary parameters:
+### 📊 Performance Metrics and Confusion Matrices
 
-```bash
-run-jind-multi --PATH "/path/to/data/All_human_brain.h5ad" \
-               --BATCH_COL "batch" \
-               --LABELS_COL "label" \
-               --SOURCE_DATASET_NAME "C4" \
-               --TARGET_DATASET_NAME "C7" \
-               --OUTPUT_PATH "/path/to/save/results" \
-               --INTER_DATASETS_NAMES "['ADx1']" \
-               --EXCLUDE_DATASETS_NAMES": "['AD2']" \
-               --NUM_FEATURES 5000 \
-               --MIN_CELL_TYPE_POPULATION 100 \
-               --PRETRAINED_MODEL_PATH "/path/to/pretrained_model_folder" \
-               --USE_GPU True
-```
+- JIND-Multi evaluates and records the classification performance at every key step:
+  - **Source batch**: Confusion matrices before and after fine-tuning.
+  - **Intermediate batches**: Performance at three stages:
+    - `initial`: Before alignment.
+    - `adapt`: After alignment to the source batch.
+    - `finetuned`: After final fine-tuning of encoder and classifier.
+  - **Target batch** (if labels are available): Confusion matrices showing:
+    - Before alignment.
+    - After adaptation.
+    - After classifier fine-tuning using confident predictions.
 
-### Option 2: Submit a Job in a HPC
-If the number of training datasets or the total number of cells is high, we recommend submitting the job using the provided `main.sh` script from the cluster directory. 
-This script is adapted to Slurm, but can be easily modified to work on SGE. 
-The specific parameters should be adapted depending on the specifications of the HPC.
+- The matrices display:
+  - Number of cells per cell type.
+  - How many were predicted as _Unknown_.
+  - Accuracy before (raw) and after (effective) thresholding.
+  - Misclassified cells.
+  - Mean Average Precision (mAP) per cell type.
 
-```bash
-cd cluster
-sbatch main.sh
-```
-### Option 3: Running with Docker
-You can run JIND-Multi using Docker with the following steps. **You must run these commands with administrator rights**.
+- **Training history summary**  
+  A PDF file named `train[SOURCE_BATCH, INTER_COUNT]-test[TARGET_BATCH].pdf` is also generated. It includes a visual history of confusion matrices across training stages, making it easier to interpret performance changes through each step of the pipeline.
 
-#### Option 3.1: Using a pre-built Docker image
 
-1. Pull the pre-built Docker image:
+## 📂 Datasets and Input Argument Guide
 
-    ```bash
-    docker pull xgarrotesan/jind_multi
-    ```
+The datasets used to reproduce the results presented in the manuscript are publicly available at the following Zenodo link:  
+🔗 https://doi.org/10.5281/zenodo.14000644
 
-2. Run the Docker container, replacing `<PATH>` with the absolute path to the folder on your system that contains the JIND-Multi repository and the `.h5ad` data files:
+> ⚠️ **Important:**  
+If you're using any of the datasets from Zenodo, please refer to the [`Input Argument Reference`](#input-argument-reference) below to correctly configure the input arguments when running the method.
 
-    ```bash
-    docker run -it -v <PATH>:/app xgarrotesan/jind_multi
-    ```
+---
 
-   **Important**: The `<PATH>` you map to the container must contain both:
-   - The **JIND-Multi repository** (the project files) 
-   - The **`.h5ad` data files** you want to process.
+## 📥 Input Argument Reference
 
-3. Activate the Conda environment inside the container:
-    ```bash
-    conda activate jind
-    ```
+> ⚠️ **High Resource Requirement:**  
+The following datasets require a High Performance Computing system (HPC) due to their large size:
+- `All_human_brain.h5ad`
+- `data_multiome_annotated_BMMC_ATAC.h5ad`
 
-4. Run JIND-Multi as usual, defining the path by mapping the unit to `app`, which is the container's folder:
+| **Dataset**     | **Type**     | **Filename**                                  | **BATCH_COL** | **LABELS_COL**             | **SOURCE_DATASET_NAME** | **TARGET_DATASET_NAME** | **INTER_DATASETS_NAMES**                                                                 | **MIN_CELL_TYPE_POPULATION** |
+|-----------------|--------------|-----------------------------------------------|---------------|-----------------------------|--------------------------|--------------------------|------------------------------------------------------------------------------------------|-------------------------------|
+| Pancreas        | scRNA-seq    | `pancreas.h5ad`                               | `batch`       | `celltype`                  | `0`                      | `3`                      | `['1', '2']`                                                                             | 5                             |
+| NSCLC Lung      | scRNA-seq    | `NSCLC_lung_NORMALIZED_FILTERED.h5ad`         | `Donor`       | `predicted_labels_majority` | `Donor5`                | `Donor2`                | `['Donor0', 'Donor1', 'Donor3', 'Donor4', 'Donor6']`                                   | 20                            |
+| Neurips Brain   | scRNA-seq    | `All_human_brain.h5ad`                        | `batch`       | `label`                     | `C4`                     | `C7`                     | `['AD2', 'ADx1', 'ADx2', 'ADx4']`                                                         | 100                           |
+| BMMC            | scATAC-seq   | `data_multiome_annotated_BMMC_ATAC.h5ad`      | `batch`       | `cell_type`                | `s4d8`                   | `s3d3`                   | `['s1d1', 's1d2', 's1d3', 's2d1', 's2d4', 's2d5', 's3d10', 's4d1']`                      | 18                            |
+| Fetal Heart     | scATAC-seq   | `heart_sample_norm_scaled_data_annotated.h5ad`| `batch`       | `celltype`                  | `heart_sample_39`        | `heart_sample_14`        | `['heart_sample_32']`                                                                    | 100                           |
+| Fetal Kidney    | scATAC-seq   | `kidney_sample_norm_scaled_data_annotated.h5ad`| `batch`      | `celltype`                  | `kidney_sample_3`        | `kidney_sample_67`       | `['kidney_sample_34', 'kidney_sample_65']`                                               | 100                           |
 
-    ```json
-    {
-        "PATH": "/app/pancreas.h5ad",
-        "BATCH_COL": "batch",
-        "LABELS_COL": "celltype",
-        "SOURCE_DATASET_NAME": "0",
-        "TARGET_DATASET_NAME": "3",
-        "OUTPUT_PATH": "/app/results",
-        "INTER_DATASETS_NAMES": "['1', '2']", 
-        "NUM_FEATURES": 5000,
-        "MIN_CELL_TYPE_POPULATION": 5,
-        "USE_GPU": true
-    }
-    ```
+---
 
-5. Finally, start JIND-Multi using the following command:
+## 📁 Additional Documentation
+- `README_execution.md`: Located in the **same directory** as this README.  
+  It provides step-by-step instructions on how to run the method:
+  - ✅ Locally  
+  - 🚀 On an HPC system  
+  - 🌐 Via the web interface
 
-    ```bash
-    run-jind-multi --config "/app/config.json"
-    ```
+- Inside the `./jind_multi/` folder:  
+  - `README.md`: Contains **detailed documentation** about each Python script included in the `jind_multi` package.
 
-#### Option 3.2: Building the Docker image locally
+# Inside the `./jind_multi/` folder:  
+  - `README_execution.md`: Contains **detailed documentation** about how run the models.
 
-If you prefer to build the Docker image locally using the provided Dockerfile:
-
-<!-- 1. Clone the repository if you haven't already:
-  ```bash
-  git clone https://github.com/ML4BM-Lab/JIND-Multi.git
-  cd JIND-Multi -->
-
-0. Go to repository folder absolute path in our case <PATH>
-  ```bash
-    cd <PATH>  
-  ```
-
-  **Very important first build docker image and then put h5ad files in repository path in our case <PATH>**
-  
-1. Build the Docker image locally:
-  ```bash
-    docker build -t jind_multi_local .  
-  ```
-
-2. Run the Docker container, ensuring that you map the local path to the folder containing both the repository and .h5ad files. Replace <PATH> with the absolute path to your system's directory:
-
-  ```bash
-    docker run -it -v <PATH>:/app jind_multi_local
-  ```
-
-Then, repeat steps 3., 4. & 5.
-
-### Output
-In the `OUTPUT_PATH`, the following outputs are saved:
-
-- A table with the predictions for each cell on the target data (**predicted_label_test_data.xlsx**:), indicating for each cell the probability calculated by the model for each cell type. The `raw_predictions` column shows the cell type with the highest probability before applying the cell type-specific threshold, and the predictions column shows the predicted cell type after filtering.
-The final trained models for each annotated batch are stored `.pt` format (saved in `trained_models` folder), and a `target.pth` file with the trained model for the target batch. The file `val_stats_trained_model.json` contains predictions on the validation test set used to compute the thresholds.
-
-- The model performance results on the source batch, intermediate datasets, and validation set after training the classifier and the fine-tuning steps. These results include confusion matrices indicating the number of cells, how many cells were assigned as ___Unknown___, and how many were correctly predicted with the accuracy percentages before (raw) and after applying the threshold (eff), as well as the incorrect predictions and the mean average precision (mAP) per cell type.
-For the source batch, confusion matrices are shown after training the classifier and the fine-tuning process. For the intermediate batches, results are shown before aligning the samples to the latent space of the source ("initial"), after alignment ("adapt"), and after the fine-tuning of the classifier and encoder to evaluate the batch aligmnent. If the target batch has labels, for performance pourposes, confusion matrices are also provided before and after the batch removal process, and after fine-tuning classifier using the most confident cells. The history of these confusion matrices is also saved in a PDF file named train[source_batch_name, number_inter_batches]-test[target_batch_name].pdf.
-
-- By default, the user will also have t-SNE/UMAPS plots with projections colored by batch or labels of the latent space generated by passing the samples through the encoder at four different moments:
-
-1) After training the encoder and classifier with the source batch ("after_train_classifier").
-2) After removing the batch effect from each intermediate batch and before inferring on the target batch ("initial").
-3) After aligning the target batch to the latent code of the source with the GAN training.
-4) After tuning the encoder and classifier for the target batch.
-
-## Notebooks
-In the `notebooks` folder, there is an example of executing JIND-Multi, explaining in detail the data processing and the internal functioning of the method.
-
-# Compare JIND Methods
-This guide explains how to evaluate and compare the annotation performance of JIND, JIND-Multi, and JIND-Combined (a method that merges all annotated datasets into one without batch effect correction) on any target dataset with known true labels.
-
-You have two options to run the comparison:
-* Run the Python script directly.
-* Submit a job to an HPC queue: you can execute the compare_methods.sh script.
-
-## Example Command
-The following example demonstrates how to run the compare-methods script with command-line arguments:
-
-```bash
-DATA_PATH="/path/to/data/pancreas/pancreas.h5ad"
-BATCH_COL="batch"
-LABELS_COL="celltype"
-SRC_DATASET="0"
-TGT_DATASET="3"
-OUT_DIR="/path/to/save/results"
-NUM_FEAT=5000
-MIN_POP=5
-USE_GPU=True 
-N_TRIAL=0
-
-echo "Running compare-methods with N_TRIAL: $N_TRIAL"
-compare-methods --PATH "$DATA_PATH" \
-                --BATCH_COL "$BATCH_COL" \
-                --LABELS_COL "$LABELS_COL" \
-                --SOURCE_DATASET_NAME "$SRC_DATASET" \
-                --TARGET_DATASET_NAME "$TGT_DATASET" \
-                --OUTPUT_PATH "$OUT_DIR" \
-                --NUM_FEATURES "$NUM_FEAT" \
-                --MIN_CELL_TYPE_POPULATION "$MIN_POP" \
-                --N_TRIAL "$N_TRIAL" \
-                --USE_GPU "$USE_GPU"
-
-```
-where,
-- **`N_TRIAL`**: (int) A numeric identifier assigned to the experiment.
-
-Alternatively, you can also run `compare-methods` using a configuration file in JSON format:
-
-```bash
-compare-methods --config /path/to/config.json
-```
-
-## Input Arguments Information
-
-**To execute All_human_brain.h5ad and data_multiome_annotated_BMMC_ATAC.h5ad you have to use a HPCSystem as it requires more resources than local OS.**
-
-| Dataset        | Type       | File                                        | BATCH_COL      | LABELS_COL                | SOURCE_DATASET_NAME | TARGET_DATASET_NAME | INTER_DATASETS_NAMES                                                                 | MIN_CELL_TYPE_POPULATION |
-|----------------|------------|---------------------------------------------|----------------|---------------------------|---------------------|---------------------|-------------------------------------------------------------------------------------|--------------------------|
-| Pancreas       | scRNA-seq  | "pancreas.h5ad"                             | "batch"        | "celltype"                | "0"                 | "3"                 | "['1', '2']"                                                                    | 5                        |
-| NSCLC Lung     | scRNA-seq  | "NSCLC_lung_NORMALIZED_FILTERED.h5ad"      | "Donor"        | "predicted_labels_majority"| "Donor5"           | "Donor2"           | "['Donor0', 'Donor1', 'Donor3', 'Donor4', 'Donor6']"                            | 20                       |
-| Neurips Brain  | scRNA-seq  | "All_human_brain.h5ad"                      | "batch"        | "label"                    | "C4"                | "C7"                | "['AD2', 'ADx1', 'ADx2', 'ADx4']"                                                    | 100                      |
-| BMMC           | scATAC-seq | "data_multiome_annotated_BMMC_ATAC.h5ad"   | "batch"        | "cell_type"                | "s4d8"              | "s3d3"              | "['s1d1', 's1d2', 's1d3', 's2d1', 's2d4', 's2d5', 's3d10', 's4d1']"                 | 18                       |
-| Fetal Heart    | scATAC-seq | "heart_sample_norm_scaled_data_annotated.h5ad"| "batch"      | "celltype"                | "heart_sample_39"      | "heart_sample_14"       | "['heart_sample_32']"                                   | 100                       |
-| Fetal Kidney   | scATAC-seq | "kidney_sample_norm_scaled_data_annotated.h5ad"| "batch"     | "celltype"                | "kidney_sample_3"     | "kidney_sample_67"       | "['kidney_sample_34', 'kidney_sample_65']"                                   | 100                      |
-
-# Additional Information
-In the ./jind_multi folder, you will find an extra README that provides a detailed explanation of each of the Python scripts in the `jind_multi` package.
+## Contact
+For questions, feedback, or support, please contact:  
+**Joseba Sancho-Zamora**  
+Email: [jsanchoz@unav.es](mailto:jsanchoz@unav.es)
