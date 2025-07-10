@@ -94,13 +94,13 @@ If you prefer to avoid local installations, you can run JIND-Multi inside a Dock
 1. Pull the pre-built Docker image:
 
     ```bash
-    docker pull xgarrotesan/jind_multi
+    docker pull ju4n5ilva/jind_multi
     ```
 
 2. Run the Docker container, replacing `<PATH>` with the absolute path to the folder on your system that contains the JIND-Multi repository and the `.h5ad` data files:
 
     ```bash
-    docker run -it -p 5003:5003 -v <PATH>:/app xgarrotesan/jind_multi
+    docker run -it -p 5003:5003 -v <PATH>:/app ju4n5ilva/jind_multi
     ```
 You can also integrate it with the JIND-Multi WebTool for an even smoother experience.
 - to run with webTool select opcion 1 
